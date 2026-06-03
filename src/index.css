@@ -600,3 +600,90 @@ input,button{font-family:inherit}
 .zone-mode .block-row{background:#fff;border:2px solid #000;border-radius:10px;box-shadow:3px 3px 0 0 #000;color:#0a0a0a}
 .zone-mode .block-row .bn{color:#0a0a0a;font-weight:800}
 .zone-mode .block-row .hh{color:#6b7280}
+
+/* ===== ZONE-MODE: TOPBAR + RIBBON ===== */
+.zone-mode{min-height:100vh}
+.zone-mode .topbar{background:#fff;border-bottom:4px solid #000;box-shadow:0 6px 0 0 rgba(0,0,0,.9)}
+.zone-mode .logo h1{color:#0a0a0a}
+.zone-mode .logo h1 b{color:#3b82f6}
+.zone-mode .logo span{color:#6b7280}
+.zone-mode .live-head{background:#fff;border:3px solid #000;color:#0a0a0a;border-radius:10px;box-shadow:3px 3px 0 0 #000;font-weight:800;padding:8px 14px}
+.zone-mode .live-head b{color:#0a0a0a !important}
+.zone-mode .btn-primary{background:#3b82f6 !important;color:#fff !important;border:3px solid #000 !important;border-radius:12px !important;box-shadow:4px 4px 0 0 #000 !important;font-weight:900;text-transform:uppercase;letter-spacing:.04em;transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
+.zone-mode .btn-primary:hover{filter:none;transform:translate(2px,2px);box-shadow:2px 2px 0 0 #000 !important}
+.zone-mode .btn-primary:active{transform:translate(4px,4px);box-shadow:0 0 0 0 #000 !important}
+.zone-mode .ribbon{background:#fff;border-bottom:4px solid #000;box-shadow:0 4px 0 0 rgba(0,0,0,.9)}
+.zone-mode .ribbon .item{border-right:2px dashed rgba(0,0,0,.2)}
+.zone-mode .ribbon .item:last-child{border-right:0}
+.zone-mode .ribbon .k{color:#6b7280}
+.zone-mode .ribbon .v{color:#0a0a0a}
+
+/* ===== ZONE-MODE: HOME PAGE ===== */
+.zone-mode .hero-tag{background:#fff;color:#0a0a0a;border:3px solid #000;border-radius:999px;box-shadow:3px 3px 0 0 #000;padding:9px 16px}
+.zone-mode .hero h1{color:#0a0a0a}
+.zone-mode .hero h1 .grad{background:linear-gradient(135deg,#3b82f6,#06b6d4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.zone-mode .hero-sub{color:#374151}
+.zone-mode .enter-btn{background:#3b82f6;color:#fff;border:4px solid #000;border-radius:14px;box-shadow:6px 6px 0 0 #000;text-transform:uppercase;letter-spacing:.04em;transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
+.zone-mode .enter-btn:hover{transform:translate(3px,3px);filter:none;box-shadow:3px 3px 0 0 #000}
+.zone-mode .enter-btn:active{transform:translate(6px,6px);box-shadow:0 0 0 0 #000}
+.zone-mode .hero-stats b{color:#0a0a0a}
+.zone-mode .hero-stats span{color:#6b7280}
+.zone-mode .sec-h{color:#0a0a0a}
+.zone-mode .sec-sub{color:#374151}
+.zone-mode .sec-sub .hl{color:#3b82f6}
+.zone-mode .step{background:#fff;border:4px solid #000;border-radius:14px;box-shadow:6px 6px 0 0 #000;color:#3b82f6}
+.zone-mode .step .num{color:rgba(0,0,0,.15)}
+.zone-mode .step h3{color:#0a0a0a}
+.zone-mode .step p{color:#6b7280}
+.zone-mode .derive .d{background:#fff;border:3px solid #000;border-radius:12px;box-shadow:4px 4px 0 0 #000}
+.zone-mode .derive .d b{color:#3b82f6}
+.zone-mode .derive .d span{color:#6b7280}
+.zone-mode .cta-end{border-top:3px dashed rgba(0,0,0,.25)}
+.zone-mode .cta-end h2{color:#0a0a0a}
+.zone-mode .cta-end p{color:#374151}
+
+/* DemoWidget (used on home) — give it a brutalist card frame */
+.zone-mode .demo,.zone-mode .demo-card{background:#fff !important;border:4px solid #000 !important;border-radius:14px !important;box-shadow:8px 8px 0 0 rgba(0,0,0,.9) !important;color:#0a0a0a !important}
+
+/* recent-blocks: verify button */
+.zone-mode .verify-btn{background:#3b82f6;color:#fff;border:2px solid #000;border-radius:8px;box-shadow:2px 2px 0 0 #000;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:6px 12px;cursor:pointer;transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
+.zone-mode .verify-btn:hover{transform:translate(1px,1px);box-shadow:1px 1px 0 0 #000}
+.zone-mode .verify-btn:active{transform:translate(2px,2px);box-shadow:0 0 0 0 #000}
+
+/* ===== ZONE-MODE: PROVABLY FAIR MODAL ===== */
+.zone-mode ~ .modal-bg,
+body:has(.zone-mode) .modal-bg{background:rgba(0,0,0,.5);backdrop-filter:blur(4px)}
+body:has(.zone-mode) .modal{background:#fff;border:4px solid #000;border-radius:16px;box-shadow:10px 10px 0 0 rgba(0,0,0,.9);color:#0a0a0a}
+body:has(.zone-mode) .modal h3{color:#0a0a0a}
+body:has(.zone-mode) .modal h3 svg{color:#3b82f6 !important}
+body:has(.zone-mode) .modal .sub{color:#374151}
+body:has(.zone-mode) .pf-row{border-top:2px dashed rgba(0,0,0,.2)}
+body:has(.zone-mode) .pf-row .k{color:#6b7280}
+body:has(.zone-mode) .pf-row .v{color:#0a0a0a}
+body:has(.zone-mode) .pf-row .v.acc{color:#3b82f6}
+body:has(.zone-mode) .pf-hash-label{color:#6b7280}
+body:has(.zone-mode) .pf-hash{background:#f5f5f5;border:2px solid #000;border-radius:10px;box-shadow:2px 2px 0 0 #000;color:#0a0a0a}
+body:has(.zone-mode) .pf-hash .hl-blue{background:#3b82f6;color:#fff;padding:2px 6px;border-radius:5px;font-weight:800}
+body:has(.zone-mode) .pf-hash .hl-green{background:#16a34a;color:#fff;padding:2px 6px;border-radius:5px;font-weight:800}
+body:has(.zone-mode) .pf-hash .hl-gold{background:#f59e0b;color:#0a0a0a;padding:2px 6px;border-radius:5px;font-weight:800}
+body:has(.zone-mode) .pf-sep{color:#0a0a0a;border-bottom:2px dashed rgba(0,0,0,.25)}
+body:has(.zone-mode) .pf-game{background:#fff;border:3px solid #000;border-radius:10px;box-shadow:3px 3px 0 0 #000;margin-bottom:10px}
+body:has(.zone-mode) .pf-game-head .gn{color:#0a0a0a}
+body:has(.zone-mode) .pf-game-head .gr{color:#3b82f6}
+body:has(.zone-mode) .pf-game-head .chev{color:#6b7280}
+body:has(.zone-mode) .pf-steps{border-top:2px dashed rgba(0,0,0,.2)}
+body:has(.zone-mode) .pf-step .si{background:#3b82f6;color:#fff}
+body:has(.zone-mode) .pf-step .sl{color:#374151}
+body:has(.zone-mode) .pf-step .sv{background:#f5f5f5;border:2px solid #000;color:#0a0a0a;border-radius:6px}
+body:has(.zone-mode) .pf-visual{background:#f5f5f5;border:2px solid #000;border-radius:10px}
+body:has(.zone-mode) .pf-visual-lbl{color:#6b7280}
+body:has(.zone-mode) .pf-visual-num .discard{color:#9ca3af;text-decoration-color:rgba(0,0,0,.25)}
+body:has(.zone-mode) .pf-visual-num .keep{background:#16a34a;color:#fff}
+body:has(.zone-mode) .pf-visual-foot .x{color:#9ca3af}
+body:has(.zone-mode) .pf-visual-foot .eq{color:#374151}
+body:has(.zone-mode) .pf-visual-foot .eq b{color:#16a34a}
+body:has(.zone-mode) .pf-btn{background:#fff;color:#3b82f6;border:3px solid #000;border-radius:10px;box-shadow:3px 3px 0 0 #000;font-weight:800;padding:10px 14px}
+body:has(.zone-mode) .pf-btn:hover{background:#f5f5f5}
+body:has(.zone-mode) .modal-close{background:#3b82f6;color:#fff;border:3px solid #000;border-radius:12px;box-shadow:4px 4px 0 0 #000;font-weight:900;text-transform:uppercase;letter-spacing:.04em;transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
+body:has(.zone-mode) .modal-close:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 0 #000}
+body:has(.zone-mode) .warn{background:#fff7ed;color:#9a3412;border:2px solid #000;border-radius:10px;box-shadow:2px 2px 0 0 #000}
