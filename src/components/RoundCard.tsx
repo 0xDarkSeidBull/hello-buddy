@@ -215,7 +215,7 @@ export default function RoundCard({
 
           {/* banks */}
           <div className="pm-banks">
-            <div><p>Total Pot</p><b style={{color:"#fff"}}>{totalPot.toFixed(2)}</b></div>
+            <div><p>Total Pot</p><b style={{color:"#000"}}>{totalPot.toFixed(2)}</b></div>
             <div><p>Bank {sideA.toUpperCase()}</p><b className="em">◆ {bankA.toFixed(2)}</b></div>
             <div><p>Bank {sideB.toUpperCase()}</p><b className="ro">◆ {bankB.toFixed(2)}</b></div>
           </div>
