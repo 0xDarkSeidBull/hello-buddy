@@ -707,7 +707,7 @@ body:has(.zone-mode) .warn{background:#fff7ed;color:#9a3412;border:2px solid #00
 
 /* perfect block prefix input */
 .pb-input-wrap{position:relative;display:flex;align-items:center;margin-bottom:8px}
-.pb-input-wrap .pb-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-family:var(--mono);font-weight:700;font-size:15px;pointer-events:none;letter-spacing:.02em}
+.pb-input-wrap .pb-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#00e5ff;font-family:var(--mono);font-weight:700;font-size:15px;pointer-events:none;letter-spacing:.02em}
 .pb-input-wrap .pb-input{padding-left:var(--pb-pad,90px);font-family:var(--mono);letter-spacing:.04em}
 /* dynamic padding via JS would be nicer; use a generous default that fits #X,XXX */
 /* hide number spinners (safety even though we use type=text now) */

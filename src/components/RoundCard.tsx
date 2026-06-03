@@ -189,11 +189,9 @@ export default function RoundCard({
                 color: "var(--muted)", fontWeight: 700 }}>Est. Target Block</span>
               <span className="mono" style={{
                 fontSize: 14, fontWeight: 700,
-                color: isLocked ? "#fb923c" : "#22d3ee",
-                textShadow: isLocked
-                  ? "0 0 12px rgba(249,115,22,.6)"
-                  : "0 0 12px rgba(34,211,238,.45)",
-              }}>#{(head + Math.round(msToSettle / 200)).toLocaleString()} <span style={{ opacity: .6 }}>~</span></span>
+                color: "#00e5ff",
+                textShadow: "0 0 12px rgba(0,229,255,.45)",
+              }}>#{(head + Math.round(msToSettle / 200)).toLocaleString()} <span style={{ opacity: .6, color: "#00e5ff" }}>~</span></span>
             </div>
           )}
 
@@ -328,7 +326,7 @@ export default function RoundCard({
               )}
               {mode.kind === "pvp" && (
                 <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
-                  <span>If you win: <b style={{ color: "#fde047" }}>◆ {totalPot.toFixed(2)} zkLTC</b> (winner takes pot)</span>
+                  <span>If you win: <b style={{ color: "#fde047" }}>◆ {Math.max(0.0196, round.players * BET * 0.98).toFixed(4)} zkLTC</b> (winner takes pot)</span>
                 </div>
               )}
               <button
