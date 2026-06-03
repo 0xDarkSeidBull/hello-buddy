@@ -1,13 +1,14 @@
 import React from "react";
 import { Shield, History, ArrowLeft, Wallet2 } from "lucide-react";
 import { api, type RoundView } from "./lib/api";
+import { signals as deriveSignals } from "./lib/modes";
 import { useAccount, useBalance } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 import RoundCard from "./components/RoundCard";
 import ProvablyFair from "./components/ProvablyFair";
 import Home from "./components/Home";
-import { type LiveBet } from "./components/YourBets";
+import YourBets, { type LiveBet } from "./components/YourBets";
 import YourBetsModal from "./components/YourBetsModal";
 import WalletButton from "./components/WalletButton";
 
@@ -57,14 +58,14 @@ export default function App() {
     const load = async () => {
       try {
         // try paginated endpoint first; fall back to legacy ?n=
-        const h: any = await api.historyPage(historyPage, 20).catch(() => null);
+        const h: any = await api.historyPage(historyPage, 10).catch(() => null);
         if (h && Array.isArray(h.history)) {
           if (!alive) return;
           setHistory(h.history);
           setHistoryPages(h.pages || 1);
           return;
         }
-        const legacy = await api.history(20);
+        const legacy = await api.history(10);
         if (!alive) return;
         setHistory(legacy.history);
         setHistoryPages(1);
@@ -75,7 +76,8 @@ export default function App() {
     return () => { alive = false; clearInterval(id); };
   }, [view, historyPage]);
 
-  // prune live bets whose round is no longer active (settled → shows up in ended)
+  // prune live bets whose round is no longer active (settled → shows up in ended).
+  // never clear ended history.
   React.useEffect(() => {
     if (rounds.length === 0) return;
     const active = new Set(rounds.map((r) => r.id));
@@ -91,7 +93,7 @@ export default function App() {
     return () => { alive = false; clearInterval(id); };
   }, []);
 
-  // clear live bets on disconnect
+  // clear live (pending) bets on disconnect — ended history is refetched from API.
   React.useEffect(() => { if (!addr) setLiveBets([]); }, [addr]);
 
   const handleBet = (roundId: number, i: { mode: string; pick: string }) => {
@@ -198,15 +200,62 @@ export default function App() {
             </div>
 
             <aside className="side">
-              <div className="side-head"><History size={15} /> Recent Blocks</div>
+              {addr && (
+                <YourBets
+                  address={addr}
+                  liveBets={liveBets}
+                  rounds={rounds.map((r) => ({ id: r.id, lockAt: r.lockAt, settleAt: r.settleAt }))}
+                />
+              )}
+              <div className="side-head" style={{ marginTop: addr ? 18 : 0 }}>
+                <History size={15} /> Ended Rounds
+              </div>
               {history.length === 0 && <div className="empty sm">No settled rounds yet.</div>}
               {history.map((r) => {
                 const b = r.targetBlock || r.result?.block;
                 if (!b) return null;
+                const s = deriveSignals(b);
+                const hashShort = `${b.hash.slice(0, 8)}…${b.hash.slice(-6)}`;
                 return (
-                  <div className="hist-row" key={r.id}>
-                    <span className="bn">#{b.number.toLocaleString()}</span>
-                    <button className="verify-btn" onClick={() => setPfBlock(b.number)}>Verify</button>
+                  <div
+                    key={r.id}
+                    style={{
+                      background: "var(--bg-2)", border: "1px solid var(--line)",
+                      borderRadius: 11, padding: "10px 12px", marginBottom: 8,
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
+                      <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+                        <span className="mono" style={{ color: "#22d3ee", fontWeight: 700, fontSize: 13 }}>
+                          #{b.number.toLocaleString()}
+                        </span>
+                        <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>
+                          Round #{r.id} · {hashShort}
+                        </span>
+                      </div>
+                      <button className="verify-btn" onClick={() => setPfBlock(b.number)}>Verify</button>
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                      {[
+                        ["E/O", s.even ? "EVEN" : "ODD"],
+                        ["HiLo", s.hilo.toUpperCase()],
+                        ["Digit", s.digit.toUpperCase()],
+                        ["0-99", String(s.mod100)],
+                        ["Txn", s.txou.toUpperCase()],
+                        ["Gas", s.gasou.toUpperCase()],
+                        ["0-999", String(s.mod1000)],
+                      ].map(([k, v]) => (
+                        <span key={k} className="mono" style={{
+                          fontSize: 9.5, color: "var(--text-2)",
+                          background: "var(--panel-2)", border: "1px solid var(--line)",
+                          borderRadius: 6, padding: "2px 6px",
+                          letterSpacing: ".02em",
+                        }}>
+                          <span style={{ color: "var(--muted)", marginRight: 4 }}>{k}</span>
+                          <b style={{ color: "#fff", fontWeight: 700 }}>{v}</b>
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 );
               })}
