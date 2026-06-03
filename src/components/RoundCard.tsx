@@ -39,6 +39,7 @@ export default function RoundCard({
   const [confirmPulled, setConfirmPulled] = React.useState(false);
   // perfect block state
   const [pbCelebrate, setPbCelebrate] = React.useState(false);
+  const [pbPrefix, setPbPrefix] = React.useState("");
   const settledRef = React.useRef<number | null>(null);
 
   const msToLock = Math.max(0, round.lockAt - now);
@@ -46,6 +47,8 @@ export default function RoundCard({
   const settled = round.status === "settled" || !!round.result;
   const isOpen = !settled && msToLock > 0;
   const isLocked = !settled && msToLock <= 0;
+  const alreadyBetModes = React.useMemo(() => new Set(myBets.map((b) => b.mode)), [myBets]);
+  const modeAlreadyBet = alreadyBetModes.has(mode.id);
 
   React.useEffect(() => {
     if (round.result && settledRef.current !== round.id) {
@@ -96,12 +99,14 @@ export default function RoundCard({
   };
 
   const finalPick =
-    mode.kind === "number" || mode.kind === "pvp" || mode.kind === "perfectblock" ? num : pick;
+    mode.kind === "perfectblock" ? (pbPrefix + num) :
+    (mode.kind === "number" || mode.kind === "pvp") ? num : pick;
   const validPick =
     mode.kind === "binary" ? mode.picks!.includes(finalPick) :
     mode.kind === "digit" ? HEX.includes(finalPick) :
+    mode.kind === "perfectblock" ? (pbPrefix !== "" && num.length === 3) :
     finalPick !== "";
-  const canConfirm = isOpen && !!addr && validPick && !placing;
+  const canConfirm = isOpen && !!addr && validPick && !placing && !modeAlreadyBet;
 
   const confirm = async () => {
     if (!canConfirm) return;
@@ -219,15 +224,32 @@ export default function RoundCard({
 
           {/* mode selector */}
           <div className="pm-modes">
-            {MODES.map((m) => (
-              <button key={m.id} className={`pm-mode ${mode.id === m.id ? "on" : ""}`} onClick={() => {
-                setMode(m);
-                // reset pick when switching mode so digits don't inherit "even" etc.
-                if (m.kind === "binary" && m.picks) setPick(m.picks[0]);
-                else setPick("");
-                setNum("");
-              }}>{m.label}</button>
-            ))}
+            {MODES.map((m) => {
+              const done = alreadyBetModes.has(m.id);
+              return (
+                <button
+                  key={m.id}
+                  className={`pm-mode ${mode.id === m.id ? "on" : ""} ${done ? "done" : ""}`}
+                  disabled={done}
+                  onClick={() => {
+                    if (done) return;
+                    setMode(m);
+                    if (m.kind === "binary" && m.picks) setPick(m.picks[0]);
+                    else setPick("");
+                    setNum("");
+                    if (m.kind === "perfectblock" && head != null) {
+                      const est = head + Math.round(Math.max(0, round.settleAt - Date.now()) / 200);
+                      const s = String(est);
+                      setPbPrefix(s.length > 3 ? s.slice(0, -3) : "");
+                    } else {
+                      setPbPrefix("");
+                    }
+                  }}>
+                  {done && <span style={{ marginRight: 4, color: "#22c55e" }}>✓</span>}
+                  {m.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* binary → voted bar + two big buttons (prediction market look) */}
@@ -265,48 +287,71 @@ export default function RoundCard({
                   </button>
                 ))}</div>
               )}
-              {(mode.kind === "number" || mode.kind === "pvp" || mode.kind === "perfectblock") && (
+              {mode.kind === "perfectblock" && (() => {
+                const prefixStr = "#" + (pbPrefix ? Number(pbPrefix).toLocaleString() : "");
+                const padLeft = 14 + prefixStr.length * 10;
+                return (
+                  <div className="pb-input-wrap">
+                    <span className="pb-prefix">{prefixStr}</span>
+                    <input
+                      className="num-input pb-input"
+                      style={{ paddingLeft: padLeft }}
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="000"
+                      maxLength={3}
+                      value={num}
+                      onChange={(e) => setNum(e.target.value.replace(/\D/g, "").slice(0, 3))}
+                    />
+                  </div>
+                );
+              })()}
+              {(mode.kind === "number" || mode.kind === "pvp") && (
                 <input
                   className="num-input"
-                  type="number"
-                  placeholder={
-                    mode.kind === "perfectblock" ? "Exact block #" : `Enter ${mode.hint}`
-                  }
+                  type="text"
+                  inputMode="numeric"
+                  placeholder={`Enter ${mode.hint}`}
                   value={num}
-                  onChange={(e) => setNum(e.target.value)}
+                  onChange={(e) => setNum(e.target.value.replace(/\D/g, ""))}
                 />
               )}
               {mode.kind === "perfectblock" && (
-                <div style={{
-                  fontSize: 12, color: "var(--text-2)", margin: "-6px 0 12px",
-                }}>
-                  <span>Guess the exact block number to win <b style={{ color: "#fde047" }}>50×</b></span>
+                <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
+                  <span>If you win: <b style={{ color: "#fde047" }}>◆ {(BET * mode.multiplier).toFixed(4)} zkLTC</b> (50×)</span>
+                </div>
+              )}
+              {mode.kind === "number" && (
+                <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
+                  <span>If you win: <b style={{ color: "#fde047" }}>◆ {(BET * mode.multiplier).toFixed(4)} zkLTC</b> ({mode.multiplier}×)</span>
+                </div>
+              )}
+              {mode.kind === "pvp" && (
+                <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
+                  <span>If you win: <b style={{ color: "#fde047" }}>◆ {totalPot.toFixed(2)} zkLTC</b> (winner takes pot)</span>
                 </div>
               )}
               <button
                 className="pm-yes full glow"
                 disabled={
                   !isOpen ||
+                  modeAlreadyBet ||
                   (!!addr && mode.kind === "digit" && !HEX.includes(pick)) ||
-                  (!!addr && (mode.kind === "number" || mode.kind === "pvp" || mode.kind === "perfectblock") && num === "")
+                  (!!addr && (mode.kind === "number" || mode.kind === "pvp") && num === "") ||
+                  (!!addr && mode.kind === "perfectblock" && (num.length !== 3 || pbPrefix === ""))
                 }
                 onClick={() => openBet(pick)}
               >
                 {!isOpen
                   ? "Locked"
-                  : !addr
-                    ? "Connect wallet to place bets"
-                    : mode.kind === "digit" && !HEX.includes(pick)
-                      ? "Pick a digit"
-                      : "Place Bet ◆ 0.01"}
+                  : modeAlreadyBet
+                    ? "✓ Already bet this round"
+                    : !addr
+                      ? "Connect wallet to place bets"
+                      : mode.kind === "digit" && !HEX.includes(pick)
+                        ? "Pick a digit"
+                        : "Place Bet ◆ 0.01"}
               </button>
-            </div>
-          )}
-
-          {myBets.length > 0 && (
-            <div className="mybets">
-              <div className="h">Your bets this round</div>
-              {myBets.map((b, i) => <div className="mybet" key={i}><span>{MODES.find((m) => m.id === b.mode)?.label} · <span className="pk">{b.pick}</span></span><span>◆ 0.01</span></div>)}
             </div>
           )}
         </motion.div>
