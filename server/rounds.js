@@ -182,7 +182,39 @@ async function settleRound(r) {
   };
   r.status = "settled";
   history.unshift({ ...roundView(r), result: r.result });
-  if (history.length > 100) history.pop();
+  if (history.length > 1000) history.pop();
+
+  // persist each settled non-PvP bet to the file-backed wallet history
+  const settledAt = Date.now();
+  for (const b of perBet) {
+    endedBets.push({
+      wallet: b.wallet,
+      roundId: r.id,
+      block: block.number,
+      mode: b.mode,
+      pick: b.pick,
+      stake: b.stake,
+      win: !!b.win,
+      payout: b.payout || 0,
+      settledAt,
+    });
+  }
+  // also record closest PvP entries
+  for (const cb of closestBets) {
+    const won = closest.winners?.find((w) => w.wallet === cb.wallet);
+    endedBets.push({
+      wallet: cb.wallet,
+      roundId: r.id,
+      block: block.number,
+      mode: "closest",
+      pick: cb.pick,
+      stake: cb.stake,
+      win: !!won,
+      payout: won ? won.payout : 0,
+      settledAt,
+    });
+  }
+  persistBets();
   rounds.delete(r.id);
 }
 
