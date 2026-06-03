@@ -114,6 +114,14 @@ export const MODES = {
     settle: () => false,
     resultOf: (block) => mod(block.hash, 1000),
   },
+  perfectblock: {
+    label: "Perfect Block",
+    desc: "Guess the exact block number → 50× reward.",
+    picks: null, // any integer block number
+    multiplier: PERFECT_BLOCK_MULTIPLIER,
+    settle: (block, pick) => Number(block.number) === Number(pick),
+    resultOf: (block) => block.number,
+  },
 };
 
 /** Settle a single (non-PvP) bet. Returns { win, payout, result }. */
