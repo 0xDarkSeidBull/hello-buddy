@@ -287,20 +287,25 @@ export default function RoundCard({
                   </button>
                 ))}</div>
               )}
-              {mode.kind === "perfectblock" && (
-                <div className="pb-input-wrap">
-                  <span className="pb-prefix">#{pbPrefix ? Number(pbPrefix).toLocaleString() : ""}</span>
-                  <input
-                    className="num-input pb-input"
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="000"
-                    maxLength={3}
-                    value={num}
-                    onChange={(e) => setNum(e.target.value.replace(/\D/g, "").slice(0, 3))}
-                  />
-                </div>
-              )}
+              {mode.kind === "perfectblock" && (() => {
+                const prefixStr = "#" + (pbPrefix ? Number(pbPrefix).toLocaleString() : "");
+                const padLeft = 14 + prefixStr.length * 10;
+                return (
+                  <div className="pb-input-wrap">
+                    <span className="pb-prefix">{prefixStr}</span>
+                    <input
+                      className="num-input pb-input"
+                      style={{ paddingLeft: padLeft }}
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="000"
+                      maxLength={3}
+                      value={num}
+                      onChange={(e) => setNum(e.target.value.replace(/\D/g, "").slice(0, 3))}
+                    />
+                  </div>
+                );
+              })()}
               {(mode.kind === "number" || mode.kind === "pvp") && (
                 <input
                   className="num-input"
