@@ -6,6 +6,7 @@ import * as W from "./lib/wallet";
 import RoundCard from "./components/RoundCard";
 import ProvablyFair from "./components/ProvablyFair";
 import Home from "./components/Home";
+import YourBets from "./components/YourBets";
 
 export default function App() {
   const [view, setView] = React.useState<"home" | "zone">("home");
@@ -156,6 +157,8 @@ export default function App() {
                   </div>
                 );
               })}
+              <YourBets addr={addr} />
+
             </aside>
           </div>
         </div>
