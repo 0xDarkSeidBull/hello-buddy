@@ -99,12 +99,14 @@ export default function RoundCard({
   };
 
   const finalPick =
-    mode.kind === "number" || mode.kind === "pvp" || mode.kind === "perfectblock" ? num : pick;
+    mode.kind === "perfectblock" ? (pbPrefix + num) :
+    (mode.kind === "number" || mode.kind === "pvp") ? num : pick;
   const validPick =
     mode.kind === "binary" ? mode.picks!.includes(finalPick) :
     mode.kind === "digit" ? HEX.includes(finalPick) :
+    mode.kind === "perfectblock" ? (pbPrefix !== "" && num.length === 3) :
     finalPick !== "";
-  const canConfirm = isOpen && !!addr && validPick && !placing;
+  const canConfirm = isOpen && !!addr && validPick && !placing && !modeAlreadyBet;
 
   const confirm = async () => {
     if (!canConfirm) return;
