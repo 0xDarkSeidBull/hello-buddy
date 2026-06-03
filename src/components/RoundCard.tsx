@@ -19,9 +19,10 @@ function useNow() {
 }
 
 export default function RoundCard({
-  round, slot, addr, onNeedConnect, onOpenPF, onBet,
+  round, slot, addr, head, onNeedConnect, onOpenPF, onBet,
 }: {
   round: RoundView; slot: "closing" | "open"; addr: string | null;
+  head: number | null;
   onNeedConnect: () => void; onOpenPF: (b: number) => void;
   onBet: (i: { mode: string; pick: string; txHash: string }) => void;
 }) {
@@ -70,7 +71,7 @@ export default function RoundCard({
     if (!addr) { onNeedConnect(); return; }
     if (!isOpen) return;
     if (mode.kind === "binary") setPick(side);
-    else if (mode.kind === "digit") setPick("0");
+    // digit mode: keep whatever the user already selected from the pick grid
     else setPick("");
     setLeverPulled(side);            // pull the lever inside the side button
     setConfirmPulled(false);
@@ -191,7 +192,12 @@ export default function RoundCard({
           {mode.kind !== "binary" && (
             <div className="pm-other">
               {mode.kind === "digit" && (
-                <div className="pick-grid">{HEX.map((d) => <button key={d} className={`pick ${pick === d ? "sel" : ""}`} onClick={() => setPick(d)}>{d}</button>)}</div>
+                <div className="pick-grid">{HEX.map((d) => (
+                  <button key={d} className={`pick ${pick === d ? "sel" : ""}`}
+                    onClick={() => { console.log('digit clicked:', d); setPick(d); }}>
+                    {d}
+                  </button>
+                ))}</div>
               )}
               {(mode.kind === "number" || mode.kind === "pvp") && (
                 <input className="num-input" type="number" placeholder={`Enter ${mode.hint}`} value={num} onChange={(e) => setNum(e.target.value)} />
