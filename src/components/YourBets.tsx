@@ -96,26 +96,12 @@ export default function YourBets({
 
   if (!address) return null;
 
-  const totalWon = ended.filter((b) => b.win).reduce((s, b) => s + (b.payout || 0), 0);
-  const totalLost = ended.filter((b) => !b.win).reduce((s, b) => s + (b.stake || 0), 0);
-
   const liveSlice = liveBets.slice(livePage * PAGE_SIZE, livePage * PAGE_SIZE + PAGE_SIZE);
   const endedSlice = ended.slice(endedPage * PAGE_SIZE, endedPage * PAGE_SIZE + PAGE_SIZE);
 
   return (
     <div className="your-bets">
       <div className="side-head"><Wallet2 size={15} /> Your Bets</div>
-
-      <div className="yb-summary">
-        <div className="yb-stat win">
-          <span className="k">Won</span>
-          <span className="v">◆ {totalWon.toFixed(4)}</span>
-        </div>
-        <div className="yb-stat loss">
-          <span className="k">Lost</span>
-          <span className="v">◆ {totalLost.toFixed(4)}</span>
-        </div>
-      </div>
 
       <div className="yb-tabs">
         <button className={`yb-tab ${tab === "live" ? "on" : ""}`} onClick={() => setTab("live")}>

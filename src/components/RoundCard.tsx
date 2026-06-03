@@ -101,8 +101,10 @@ export default function RoundCard({
     mode.kind === "binary" ? mode.picks!.includes(finalPick) :
     mode.kind === "digit" ? HEX.includes(finalPick) :
     finalPick !== "";
-  // Perfect Block requires the window to be open on the HOT card.
-  const pbWindowOpen = slot === "open" && !!round.perfectBlockOpen && isOpen;
+  // Perfect Block window is the 8:00–10:00 remaining slice of the round.
+  // Compute client-side from settleAt so the button disables instantly at 8:00
+  // without waiting for API refresh.
+  const pbWindowOpen = slot === "open" && isOpen && msToSettle >= 480000 && msToSettle <= 600000;
   const pbBlocked = mode.id === "perfectblock" && !pbWindowOpen;
   const canConfirm = isOpen && !!addr && validPick && !placing && !pbBlocked;
 
