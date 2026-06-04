@@ -221,6 +221,7 @@ export default function App() {
               {rounds.length === 0 && <div className="empty">Connecting to the round engine…</div>}
               {rounds.length > 0 && (
                 <RoundsCarousel
+                  key={resetKey}
                   rounds={rounds}
                   addr={addr}
                   head={head}
