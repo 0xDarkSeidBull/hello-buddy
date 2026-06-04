@@ -434,16 +434,6 @@ function ModeDetail({
         <Row k="Stake" v={<><Coin size={13} /> {bet.stake.toFixed(4)}</>} mono />
         <Row k="Result" v={bet.win ? <>WIN +<Coin size={13} />{bet.payout.toFixed(4)}</> : <>LOSS -<Coin size={13} />{bet.stake.toFixed(4)}</>}
           color={bet.win ? "#16a34a" : "#dc2626"} />
-        {bet.win && (
-          <Row k="Payout TX" v={
-            bet.payoutTx
-              ? <a href={`${EXPLORER}/tx/${bet.payoutTx}`} target="_blank" rel="noreferrer"
-                  style={{ color: "#2563eb", textDecoration: "underline" }}>
-                  {`${bet.payoutTx.slice(0, 6)}...${bet.payoutTx.slice(-4)}`}
-                </a>
-              : <span style={{ color: "#9ca3af" }}>Pending...</span>
-          } mono />
-        )}
       </>
     ) : <NoBet />;
   }
