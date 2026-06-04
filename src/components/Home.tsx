@@ -7,6 +7,13 @@ export default function Home({ onEnter }: { onEnter: () => void }) {
     <div className="home">
       {/* hero */}
       <section className="hero">
+        <img
+          src="https://raw.githubusercontent.com/dopedopex/your-friendly-helper/main/bob_logo.jpg"
+          alt="BetsOnBlock"
+          width={200}
+          height={200}
+          style={{ display: "block", margin: "0 auto 24px", borderRadius: 28, objectFit: "cover", boxShadow: "8px 8px 0 0 rgba(0,0,0,.9)", border: "4px solid #000" }}
+        />
         <div className="hero-tag"><span className="pulse" /> Provably fair · Powered by LitVM blocks</div>
         <h1>Bet on the<br /><span className="grad">next block.</span></h1>
         <p className="hero-sub">
