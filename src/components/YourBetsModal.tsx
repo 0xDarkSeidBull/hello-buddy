@@ -4,6 +4,7 @@ import { X, Check, Search, ExternalLink } from "lucide-react";
 import { MODES, MODE_MAP, signals as deriveSignals } from "../lib/modes";
 import { EXPLORER } from "../lib/wagmi";
 import type { LiveBet } from "./YourBets";
+import Coin from "./Coin";
 
 type EndedBet = {
   roundId: number;
@@ -265,7 +266,7 @@ export default function YourBetsModal({
                         blockKey={`ended-${g.block}`}
                         blockLabel={`#${g.block.toLocaleString()}`}
                         badgeKind={won ? "win" : "loss"}
-                        badgeValue={`${won ? "+" : "-"}◆${Math.abs(g.net).toFixed(4)}`}
+                        badgeValue={<><>{won ? "+" : "-"}</><Coin size={11} />{Math.abs(g.net).toFixed(4)}</>}
                         betsByMode={Object.fromEntries(g.bets.map((b) => [b.mode, b]))}
                         onModeClick={(m) => openDetail(`ended-${g.block}`, m, g.block)}
                         footer={
@@ -429,8 +430,8 @@ function ModeDetail({
         {v?.block?.hash && <Row k="Hash" v={v.block.hash} mono small />}
         <Row k="Your pick" v={bet.pick.toUpperCase()} mono />
         <Row k="Block produced" v={String(actual)} mono />
-        <Row k="Stake" v={`◆ ${bet.stake.toFixed(4)}`} mono />
-        <Row k="Result" v={bet.win ? `WIN +◆${bet.payout.toFixed(4)}` : `LOSS -◆${bet.stake.toFixed(4)}`}
+        <Row k="Stake" v={<><Coin size={13} /> {bet.stake.toFixed(4)}</>} mono />
+        <Row k="Result" v={bet.win ? <>WIN +<Coin size={13} />{bet.payout.toFixed(4)}</> : <>LOSS -<Coin size={13} />{bet.stake.toFixed(4)}</>}
           color={bet.win ? "#16a34a" : "#dc2626"} />
       </>
     ) : <NoBet />;
