@@ -2,6 +2,7 @@ import React from "react";
 import { Wallet2, ChevronDown, ChevronUp, ExternalLink, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { EXPLORER } from "../lib/wagmi";
 import { MODE_MAP, signals as deriveSignals } from "../lib/modes";
+import Coin from "./Coin";
 
 export type LiveBet = {
   roundId: number;
@@ -132,7 +133,7 @@ export default function YourBets({
                   </div>
                   <div className="yb-live-row">
                     <span><i>Picked</i> <b className="mono">{b.pick.toUpperCase()}</b></span>
-                    <span><i>Stake</i> <b>◆ {b.stake.toFixed(4)}</b></span>
+                    <span><i>Stake</i> <b><Coin size={13} /> {b.stake.toFixed(4)}</b></span>
                   </div>
                 </div>
               );
@@ -177,7 +178,7 @@ export default function YourBets({
                     <span className="yb-block mono">#{b.block}</span>
                     <span className="yb-mode-sm">{meta?.label ?? b.mode}</span>
                     <span className={`yb-result ${b.win ? "win" : "loss"}`}>{b.win ? "WIN" : "LOSS"}</span>
-                    <span className="yb-pay mono">◆ {(b.win ? b.payout : 0).toFixed(4)}</span>
+                    <span className="yb-pay mono"><Coin size={13} /> {(b.win ? b.payout : 0).toFixed(4)}</span>
                     {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                   </button>
                   {isOpen && (
@@ -189,11 +190,11 @@ export default function YourBets({
                       <div className="yb-d-row"><i>Mode</i><b>{meta?.label ?? b.mode}</b></div>
                       <div className="yb-d-row"><i>Your pick</i><b className="mono">{b.pick.toUpperCase()}</b></div>
                       <div className="yb-d-row"><i>Signal</i><b className="mono">{String(actual)}</b></div>
-                      <div className="yb-d-row"><i>Stake</i><b className="mono">◆ {b.stake.toFixed(4)}</b></div>
+                      <div className="yb-d-row"><i>Stake</i><b className="mono"><Coin size={13} /> {b.stake.toFixed(4)}</b></div>
                       <div className="yb-d-row">
                         <i>Result</i>
                         <b className={b.win ? "win-t" : "loss-t"}>
-                          {b.win ? `WIN · +◆ ${b.payout.toFixed(4)}` : `LOSS · −◆ ${b.stake.toFixed(4)}`}
+                          {b.win ? <>WIN · +<Coin size={13} /> {b.payout.toFixed(4)}</> : <>LOSS · −<Coin size={13} /> {b.stake.toFixed(4)}</>}
                         </b>
                       </div>
                       <a
