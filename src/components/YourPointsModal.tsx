@@ -14,14 +14,13 @@ export default function YourPointsModal({
     let alive = true;
     const load = async () => {
       try {
-        const r = await fetch(`${API_BASE}/api/points/${address}`);
+        const r = await fetch(`${API_BASE}/api/points/${address.toLowerCase()}`);
         if (!r.ok) throw new Error("http_" + r.status);
         const j = await r.json();
         if (!alive) return;
-        const v = typeof j.points === "number" ? j.points
-                : typeof j.balance === "number" ? j.balance
-                : typeof j === "number" ? j : 0;
-        setPoints(v);
+        const raw = j?.points ?? j?.balance ?? j;
+        const v = typeof raw === "string" ? Number(raw) : (typeof raw === "number" ? raw : 0);
+        setPoints(Number.isFinite(v) ? v : 0);
       } catch (e: any) {
         if (alive) setErr(e?.message || "failed");
       }
