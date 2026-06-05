@@ -269,6 +269,7 @@ export default function YourBetsModal({
                         badgeKind={won ? "win" : "loss"}
                         badgeValue={<><>{won ? "+" : "-"}</><Coin size={11} />{Math.abs(g.net).toFixed(4)}</>}
                         betsByMode={Object.fromEntries(g.bets.map((b) => [b.mode, b]))}
+                        showPointsBadge
                         onModeClick={(m) => openDetail(`ended-${g.block}`, m, g.block)}
                         footer={
                           <a href={`${EXPLORER}/block/${g.block}`} target="_blank" rel="noreferrer"
