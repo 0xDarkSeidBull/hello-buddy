@@ -64,7 +64,6 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
   const [amount, setAmount] = React.useState("0.01");
   const [placing, setPlacing] = React.useState(false);
   const [betError, setBetError] = React.useState<string | null>(null);
-  const [resolveModal, setResolveModal] = React.useState<EndedRound | null>(null);
   const [verifyModal, setVerifyModal] = React.useState<{ loading: boolean; data: RoundDetails | null; error?: string; round_id: number } | null>(null);
   const [endedOverlay, setEndedOverlay] = React.useState<EndedRound | null>(null);
   const [now, setNow] = React.useState(Date.now());
