@@ -488,14 +488,14 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
               <div style={{
                 fontFamily: "'JetBrains Mono',monospace",
                 fontWeight: 900, fontSize: 42, textAlign: "center",
-                color: isLocked ? "#ef4444" : "#16a34a",
-                textShadow: isLocked ? "0 0 12px rgba(239,68,68,.4)" : "0 0 12px rgba(22,163,74,.3)",
+                color: isCooldown ? "#00d4ff" : isLocked ? "#ef4444" : "#16a34a",
+                textShadow: isCooldown ? "0 0 12px rgba(0,212,255,.4)" : isLocked ? "0 0 12px rgba(239,68,68,.4)" : "0 0 12px rgba(22,163,74,.3)",
                 lineHeight: 1,
               }}>
-                {fmtClock(timeLeftMs)}
+                {isCooldown ? `0:${cooldownSeconds.toString().padStart(2, "0")}` : fmtClock(timeLeftMs)}
               </div>
-              <div style={{ textAlign: "center", marginTop: 6, fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: isLocked ? "#ef4444" : "#16a34a", fontWeight: 800 }}>
-                {isLocked ? "Locking — no new bets" : "Open — place your bets"}
+              <div style={{ textAlign: "center", marginTop: 6, fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: isCooldown ? "#00d4ff" : isLocked ? "#ef4444" : "#16a34a", fontWeight: 800 }}>
+                {isCooldown ? "Cooldown — next round soon" : isLocked ? "Locking — no new bets" : "Open — place your bets"}
               </div>
             </div>
 
