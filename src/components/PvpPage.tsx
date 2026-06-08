@@ -24,6 +24,14 @@ type EndedRound = {
   drand_round?: number | string;
 };
 
+type RoundDetails = {
+  round_id: number;
+  winning_tile: number;
+  drand_randomness?: string;
+  drand_target_round?: number | string;
+  drand_verify_url?: string;
+};
+
 function fmtClock(ms: number) {
   const s = Math.max(0, Math.ceil(ms / 1000));
   return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
