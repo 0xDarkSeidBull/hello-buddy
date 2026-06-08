@@ -337,59 +337,10 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
               onTileClick={onSegmentClick}
             />
 
-            {endedOverlay && (
-              <div style={{
-                position: "absolute", inset: 0, display: "grid", placeItems: "center",
-                background: "rgba(0,0,0,.55)", borderRadius: 14, zIndex: 10,
-              }}>
-                <div style={{
-                  background: "#fff", border: "4px solid #000", borderRadius: 14,
-                  boxShadow: "8px 8px 0 0 #000", padding: "18px 22px",
-                  textAlign: "center", minWidth: 280,
-                }}>
-                  <div style={{ fontSize: 11, letterSpacing: ".22em", color: "#6b7280", fontWeight: 800 }}>
-                    ROUND #{endedOverlay.round_id} ENDED
-                  </div>
-                  <div style={{
-                    fontFamily: "'Space Grotesk',system-ui,sans-serif",
-                    fontSize: 28, fontWeight: 900, color: "#16a34a",
-                    margin: "8px 0 4px",
-                  }}>
-                    🏆 Tile {endedOverlay.winning_tile} Wins!
-                  </div>
-                  <div style={{ fontSize: 11, letterSpacing: ".16em", color: "#6b7280", fontWeight: 800, textTransform: "uppercase" }}>
-                    New Round Starting…
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* SIDEBAR */}
           <aside style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {/* Countdown / round */}
-            <div style={{
-              background: "#fff", border: "3px solid #000", borderRadius: 14,
-              boxShadow: "5px 5px 0 0 #000", padding: 18,
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <span style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "#6b7280", fontWeight: 800 }}>Round</span>
-                <span className="mono" style={{ color: "#0a0a0a", fontWeight: 900, fontSize: 14 }}>#{status?.round_id ?? "—"}</span>
-              </div>
-              <div style={{
-                fontFamily: "'JetBrains Mono',monospace",
-                fontWeight: 900, fontSize: 42, textAlign: "center",
-                color: isCooldown ? "#00d4ff" : isLocked ? "#ef4444" : "#16a34a",
-                textShadow: isCooldown ? "0 0 12px rgba(0,212,255,.4)" : isLocked ? "0 0 12px rgba(239,68,68,.4)" : "0 0 12px rgba(22,163,74,.3)",
-                lineHeight: 1,
-              }}>
-                {isCooldown ? `0:${cooldownSeconds.toString().padStart(2, "0")}` : fmtClock(timeLeftMs)}
-              </div>
-              <div style={{ textAlign: "center", marginTop: 6, fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: isCooldown ? "#00d4ff" : isLocked ? "#ef4444" : "#16a34a", fontWeight: 800 }}>
-                {isCooldown ? "Cooldown — next round soon" : isLocked ? "Locking — no new bets" : "Open — place your bets"}
-              </div>
-            </div>
-
             {/* Drand */}
             <div style={{
               background: "#fff7ed", border: "3px solid #000", borderRadius: 14,
