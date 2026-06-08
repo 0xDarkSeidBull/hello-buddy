@@ -334,6 +334,11 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
               <text x={cx} y={cy + 38} textAnchor="middle"
                 fill="#fff7ed" fontFamily="'Space Grotesk',system-ui,sans-serif"
                 fontSize={10} fontWeight={700} letterSpacing={2}>zkLTC</text>
+              <text x={cx} y={cy + 60} textAnchor="middle"
+                fill="#9ca3af" fontFamily="'JetBrains Mono',monospace"
+                fontSize={10} fontWeight={800} letterSpacing={1}>
+                ROUND #{status?.round_id ?? "—"}
+              </text>
             </svg>
 
             {isLocked && (
@@ -347,6 +352,33 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
                 display: "inline-flex", alignItems: "center", gap: 6,
               }}>
                 <Lock size={14} /> LOCKED
+              </div>
+            )}
+
+            {endedOverlay && (
+              <div style={{
+                position: "absolute", inset: 0, display: "grid", placeItems: "center",
+                background: "rgba(0,0,0,.55)", borderRadius: 14, zIndex: 10,
+              }}>
+                <div style={{
+                  background: "#fff", border: "4px solid #000", borderRadius: 14,
+                  boxShadow: "8px 8px 0 0 #000", padding: "18px 22px",
+                  textAlign: "center", minWidth: 280,
+                }}>
+                  <div style={{ fontSize: 11, letterSpacing: ".22em", color: "#6b7280", fontWeight: 800 }}>
+                    ROUND #{endedOverlay.round_id} ENDED
+                  </div>
+                  <div style={{
+                    fontFamily: "'Space Grotesk',system-ui,sans-serif",
+                    fontSize: 28, fontWeight: 900, color: "#16a34a",
+                    margin: "8px 0 4px",
+                  }}>
+                    🏆 Tile {endedOverlay.winning_tile} Wins!
+                  </div>
+                  <div style={{ fontSize: 11, letterSpacing: ".16em", color: "#6b7280", fontWeight: 800, textTransform: "uppercase" }}>
+                    New Round Starting…
+                  </div>
+                </div>
               </div>
             )}
           </div>
