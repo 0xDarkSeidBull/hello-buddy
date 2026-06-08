@@ -167,8 +167,8 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
   const timeLeftMs = status
     ? Math.max(0, status.time_left_ms - (Date.now() - statusFetchedAt))
     : 0;
-  const isLocked = status?.status === "locked" || timeLeftMs < 30_000;
-  const isOpen = status?.status === "open" && timeLeftMs >= 30_000;
+  const isLocked = status?.status === "locked";
+  const isOpen = status?.status === "open";
   const myBetsThisRound = myBets.filter((b) => status && b.round_id === status.round_id);
   const myTilesThisRound = new Set(myBetsThisRound.map((b) => b.tile));
 
