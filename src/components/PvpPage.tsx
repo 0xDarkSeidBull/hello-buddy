@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, Shield, History, Wallet2, X, Lock } from "lucide-react";
+import { ArrowLeft, Shield, History, Wallet2, X, Lock, ExternalLink } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import CoinImg from "./Coin";
