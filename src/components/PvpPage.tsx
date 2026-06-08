@@ -280,6 +280,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="app zone-mode" style={{ minHeight: "100vh" }}>
+      <style>{`@keyframes pvpSpinIn { from { transform: rotate(-360deg); } to { transform: rotate(0); } }`}</style>
       <div className="topbar">
         <div className="logo" style={{ cursor: "pointer" }} onClick={onBack}>
           <img src="https://raw.githubusercontent.com/dopedopex/your-friendly-helper/main/logo.png" alt="" width={36} height={36} style={{ borderRadius: 10, objectFit: "cover" }} />
