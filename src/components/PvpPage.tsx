@@ -635,3 +635,27 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
     </div>
   );
 }
+
+function PvpAccordion({ name, result, steps }: { name: string; result: string; steps: Array<[string, string]> }) {
+  const [open, setOpen] = React.useState(true);
+  return (
+    <div className="pf-game">
+      <button className="pf-game-head" onClick={() => setOpen((o) => !o)}>
+        <span className="gn">{name}</span>
+        <span className="gr">{result}</span>
+        <span className={`chev ${open ? "o" : ""}`}>▾</span>
+      </button>
+      {open && (
+        <div className="pf-steps">
+          {steps.map(([label, val], i) => (
+            <div className="pf-step" key={i}>
+              <span className="si">{i + 1}</span>
+              <span className="sl">{label}</span>
+              {val && <span className="sv">{val}</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
