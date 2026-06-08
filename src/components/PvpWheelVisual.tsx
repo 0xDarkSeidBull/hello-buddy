@@ -112,6 +112,7 @@ export default function PvpWheelVisual({
 
   const lastTickSec = React.useRef(-1);
   const lastCdSec = React.useRef(-1);
+  const lastRoundRef = React.useRef<number | null>(null);
 
   // beep last 10s of open
   React.useEffect(() => {
@@ -131,10 +132,12 @@ export default function PvpWheelVisual({
     }
   }, [cdSecs, soundOn, isCooldown]);
 
-  // run sequence A→E once per cooldown winner
+  // run sequence A→E whenever a new winner is announced
   React.useEffect(() => {
-    if (!isCooldown || winningTile == null) return;
+    if (winningTile == null) return;
     if (wonRef.current === winningTile) return;
+    // only run when round is no longer open (locked or cooldown)
+    if (isOpen) return;
     wonRef.current = winningTile;
 
     const timers: number[] = [];
@@ -235,7 +238,7 @@ export default function PvpWheelVisual({
 
   // PHASE G — new round
   React.useEffect(() => {
-    if (!isCooldown && phase !== "idle") {
+    if (roundId !== lastRoundRef.current && lastRoundRef.current !== null) {
       setFlash(true);
       if (soundOn) audio.whoosh();
       const t1 = window.setTimeout(() => setFlash(false), 320);
@@ -243,10 +246,12 @@ export default function PvpWheelVisual({
       setSeqIdx(0); setSpinIdx(0);
       wonRef.current = null;
       setBounceKey((k) => k + 1);
+      lastRoundRef.current = roundId;
       return () => window.clearTimeout(t1);
     }
+    if (lastRoundRef.current === null) lastRoundRef.current = roundId;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isCooldown]);
+  }, [roundId]);
 
   // geometry
   const cx = size / 2;
@@ -364,7 +369,10 @@ export default function PvpWheelVisual({
           return (
             <g
               key={`t-${tile}`}
-              onClick={() => onTileClick(tile)}
+              onClick={() => {
+                if (soundOn && isOpen) audio.tick();
+                onTileClick(tile);
+              }}
               className="pvpTile"
               data-default={t.fill === "#0f172a" && phase === "idle" ? "1" : "0"}
               style={{
