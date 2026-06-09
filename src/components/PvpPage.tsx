@@ -440,14 +440,23 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
     let okCount = 0;
     let errMsg: string | null = null;
     let lastTxHash: string | null = null;
-    for (const tile of tiles) {
-      if (myTilesThisRound.has(tile)) continue;
-      try {
-        const tx = await contract.placeBet(Number(tile), { value });
-        const receipt = await tx.wait();
-        const txHash: string = receipt?.hash ?? tx.hash;
-        lastTxHash = txHash;
-        // notify backend
+    const tilesArray = tiles.filter((t) => !myTilesThisRound.has(t)).map(Number);
+    if (tilesArray.length === 0) {
+      setPlacing(false);
+      return;
+    }
+    const totalValue = value * BigInt(tilesArray.length);
+    try {
+      const tx = tilesArray.length === 1
+        ? await contract.placeBet(tilesArray[0], { value: totalValue })
+        : await contract.placeBetMulti(tilesArray, { value: totalValue });
+      const receipt = await tx.wait();
+      const txHash: string = receipt?.hash ?? tx.hash;
+      lastTxHash = txHash;
+      okCount = tilesArray.length;
+      sounds.betPlaced();
+      // notify backend for each tile
+      for (const tile of tilesArray) {
         try {
           await fetch(CONFIRM_URL, {
             method: "POST",
@@ -455,12 +464,9 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
             body: JSON.stringify({ wallet: addr, tile: Number(tile), amount: Number(amt), tx_hash: txHash }),
           });
         } catch { /* non-fatal */ }
-        okCount++;
-        sounds.betPlaced();
-      } catch (e: any) {
-        errMsg = e?.shortMessage || e?.reason || e?.message || "tx failed";
-        if (/user rejected|denied/i.test(errMsg || "")) break;
       }
+    } catch (e: any) {
+      errMsg = e?.shortMessage || e?.reason || e?.message || "tx failed";
     }
     setPlacing(false);
     if (okCount > 0) {
