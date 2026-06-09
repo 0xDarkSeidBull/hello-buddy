@@ -183,7 +183,12 @@ export default function BetPanel({
               color: "#475569", borderRadius: 6, padding: "6px 10px", cursor: "pointer", fontWeight: 700,
             }}>×</button>
           </div>
-        </div>
+        {mode === "manual" && (
+          <div style={{ marginTop: 6, fontSize: 12, color: "#475569", fontWeight: 700 }}>
+            Total: <span style={{ color: "#0f172a", fontFamily: "ui-monospace,monospace" }}>{total.toFixed(4)} zkLTC</span> for {count} tile{count === 1 ? "" : "s"}
+          </div>
+        )}
+      </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Coin size={28} />
           <input
