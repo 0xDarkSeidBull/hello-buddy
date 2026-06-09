@@ -387,6 +387,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
     setPlacing(false);
     if (okCount > 0) {
       setToast(`✓ Bet placed on ${okCount} tile${okCount > 1 ? "s" : ""}`);
+      selectedTilesRef.current = new Set();
       setSelectedTilesState(new Set());
       loadMyBets();
       loadStatus();
