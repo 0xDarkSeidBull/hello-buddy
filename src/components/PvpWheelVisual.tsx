@@ -354,7 +354,7 @@ export default function PvpWheelVisual({
 
         <svg
           viewBox="0 0 580 580"
-          style={{ position: "relative", zIndex: 10, width: "100%", height: "100%", overflow: "visible", userSelect: "none", filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.5))" }}
+          style={{ position: "relative", zIndex: 10, width: "100%", height: "100%", overflow: "visible", userSelect: "none", filter: "drop-shadow(0 6px 12px rgba(15,23,42,0.12))" }}
         >
           {TILE_ANGLES.map((tile) => {
             const s = getTileStyles(tile.id);
