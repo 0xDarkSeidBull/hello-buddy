@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { History as HistoryIcon, X, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 
 const HISTORY_URL = "https://lit-api.test-hub.xyz/bets/history";
