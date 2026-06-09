@@ -45,4 +45,45 @@ export const sounds = {
     g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.6);
     return 0.6;
   }),
+  // Triumphant multi-oscillator chord stinger for the winning-tile reveal.
+  jackpot: () => {
+    const a = ac(); if (!a) return;
+    const now = a.currentTime;
+    // Major chord arpeggio: C5, E5, G5, C6
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, i) => {
+      const start = now + i * 0.07;
+      const o = a.createOscillator();
+      const g = a.createGain();
+      o.type = i === notes.length - 1 ? 'triangle' : 'sine';
+      o.frequency.setValueAtTime(freq, start);
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.exponentialRampToValueAtTime(0.22, start + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, start + 0.9);
+      o.connect(g); g.connect(a.destination);
+      o.start(start); o.stop(start + 0.95);
+    });
+    // Sub bass thump
+    const bo = a.createOscillator();
+    const bg = a.createGain();
+    bo.type = 'sine';
+    bo.frequency.setValueAtTime(140, now);
+    bo.frequency.exponentialRampToValueAtTime(70, now + 0.35);
+    bg.gain.setValueAtTime(0.0001, now);
+    bg.gain.exponentialRampToValueAtTime(0.3, now + 0.02);
+    bg.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+    bo.connect(bg); bg.connect(a.destination);
+    bo.start(now); bo.stop(now + 0.55);
+    // Sparkle high ping
+    const so = a.createOscillator();
+    const sg = a.createGain();
+    so.type = 'square';
+    so.frequency.setValueAtTime(1760, now + 0.25);
+    so.frequency.exponentialRampToValueAtTime(2637, now + 0.45);
+    sg.gain.setValueAtTime(0.0001, now + 0.25);
+    sg.gain.exponentialRampToValueAtTime(0.05, now + 0.27);
+    sg.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+    so.connect(sg); sg.connect(a.destination);
+    so.start(now + 0.25); so.stop(now + 0.75);
+  },
 };
