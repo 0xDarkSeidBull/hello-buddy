@@ -574,7 +574,10 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="wrap" style={{ paddingTop: 8 }}>
-        <button className="back-link" onClick={onBack} style={{ color: "#0f172a", marginBottom: 6 }}><ArrowLeft size={14} /> Back to home</button>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 6, flexWrap: "wrap" }}>
+          <button className="back-link" onClick={onBack} style={{ color: "#0f172a" }}><ArrowLeft size={14} /> Back to home</button>
+          <MyBetsModal address={addr} refreshKey={myBetsRefresh} />
+        </div>
 
 
         <div style={{ display: "grid", gridTemplateColumns: "320px 1fr 320px", gap: 22, alignItems: "start" }}>
