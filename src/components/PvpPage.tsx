@@ -355,10 +355,6 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
   const myBetsThisRound = myBets.filter((b) => status && b.round_id === status.round_id);
   const myTilesThisRound = new Set(myBetsThisRound.map((b) => b.tile));
 
-  const setSelectedTiles = React.useCallback((s: Set<number>) => {
-    setSelectedTilesState(s);
-  }, []);
-
   const setSelectedTiles = updateSelection;
 
   const onSegmentClick = (tile: number) => {
