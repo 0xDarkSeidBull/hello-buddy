@@ -2,15 +2,56 @@ import React from "react";
 import { ArrowLeft, Shield, History, ExternalLink } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { BrowserProvider, Contract, parseEther } from "ethers";
 import PvpWheelVisual from "./PvpWheelVisual";
 import BetPanel, { AutoConfig } from "./BetPanel";
 import { sounds } from "../lib/pvpSounds";
 
-const API = "https://lit-api.test-hub.xyz";
+const API = "https://betsonblock-api.test-hub.xyz";
 const STATUS_URL = `${API}/bets/status`;
 const HISTORY_URL = `${API}/bets/history`;
-const PLACE_URL = `${API}/bets/place`;
+const CONFIRM_URL = `${API}/bets/confirm`;
 const TILES = 30;
+
+const CONTRACT_ADDRESS = "0xf82776F9b7FcC338d6a677F138f55eE0Cf26807A";
+const CHAIN_ID = 4441;
+const CHAIN_ID_HEX = "0x1159";
+const RPC_URL = "https://liteforge.rpc.caldera.xyz/http";
+const EXPLORER_TX = "https://liteforge.explorer.caldera.xyz/tx";
+const MIN_BET = 0.001;
+
+const BET_ABI = [
+  {
+    inputs: [{ internalType: "uint8", name: "tile", type: "uint8" }],
+    name: "placeBet",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+] as const;
+
+async function ensureLiteForge() {
+  const eth = (window as any).ethereum;
+  if (!eth) throw new Error("No wallet found. Install MetaMask.");
+  try {
+    await eth.request({ method: "wallet_switchEthereumChain", params: [{ chainId: CHAIN_ID_HEX }] });
+  } catch (e: any) {
+    if (e?.code === 4902) {
+      await eth.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId: CHAIN_ID_HEX,
+          chainName: "LiteForge",
+          rpcUrls: [RPC_URL],
+          nativeCurrency: { name: "zkLTC", symbol: "zkLTC", decimals: 18 },
+          blockExplorerUrls: ["https://liteforge.explorer.caldera.xyz"],
+        }],
+      });
+    } else {
+      throw e;
+    }
+  }
+}
 
 
 type Status = {
@@ -92,6 +133,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
   const [lastResolvedRound, setLastResolvedRound] = React.useState<EndedRound | null>(null);
   const [cooldownSeconds, setCooldownSeconds] = React.useState<number>(0);
   const [toast, setToast] = React.useState<string | null>(null);
+  const [lastTxHash, setLastTxHash] = React.useState<string | null>(null);
   const [animationWinner, setAnimationWinner] = React.useState<EndedRound | null>(null);
 
   const prevRoundRef = React.useRef<number | null>(null);
@@ -367,26 +409,72 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
 
   const placeBetsForTiles = React.useCallback(async (tiles: number[], amt: number) => {
     if (!addr || tiles.length === 0) return;
+    if (!(amt >= MIN_BET)) {
+      setToast(`❌ Minimum bet is ${MIN_BET} zkLTC`);
+      setTimeout(() => setToast(null), 3500);
+      return;
+    }
+    const eth = (window as any).ethereum;
+    if (!eth) {
+      setToast("❌ No wallet found. Install MetaMask.");
+      setTimeout(() => setToast(null), 3500);
+      return;
+    }
     setPlacing(true);
+    try {
+      await ensureLiteForge();
+    } catch (e: any) {
+      setPlacing(false);
+      setToast(`❌ ${e?.message || "Wrong network. Switch to LiteForge."}`);
+      setTimeout(() => setToast(null), 3500);
+      return;
+    }
+    const provider = new BrowserProvider(eth);
+    const net = await provider.getNetwork();
+    if (Number(net.chainId) !== CHAIN_ID) {
+      setPlacing(false);
+      setToast("❌ Wrong network. Switch to LiteForge (4441).");
+      setTimeout(() => setToast(null), 3500);
+      return;
+    }
+    const signer = await provider.getSigner();
+    const contract = new Contract(CONTRACT_ADDRESS, BET_ABI, signer);
+    const value = parseEther(String(amt));
+
     let okCount = 0;
     let errMsg: string | null = null;
+    let lastTxHash: string | null = null;
     for (const tile of tiles) {
       if (myTilesThisRound.has(tile)) continue;
       try {
-        const r = await fetch(PLACE_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ wallet: addr, tile: Number(tile), amount: Number(amt) }),
-        });
-        const j = await r.json().catch(() => ({}));
-        if (!r.ok || j?.error) { errMsg = j?.error || `http_${r.status}`; }
-        else { okCount++; sounds.betPlaced(); }
-      } catch (e: any) { errMsg = e?.message || "fail"; }
-      await new Promise((res) => setTimeout(res, 100));
+        const tx = await contract.placeBet(Number(tile), { value });
+        const receipt = await tx.wait();
+        const txHash: string = receipt?.hash ?? tx.hash;
+        lastTxHash = txHash;
+        // notify backend
+        try {
+          await fetch(CONFIRM_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ wallet: addr, tile: Number(tile), amount: Number(amt), tx_hash: txHash }),
+          });
+        } catch { /* non-fatal */ }
+        okCount++;
+        sounds.betPlaced();
+      } catch (e: any) {
+        errMsg = e?.shortMessage || e?.reason || e?.message || "tx failed";
+        if (/user rejected|denied/i.test(errMsg || "")) break;
+      }
     }
     setPlacing(false);
     if (okCount > 0) {
-      setToast(`✓ Bet placed on ${okCount} tile${okCount > 1 ? "s" : ""}`);
+      const shortTx = lastTxHash ? `${lastTxHash.slice(0, 8)}…${lastTxHash.slice(-6)}` : "";
+      setToast(
+        lastTxHash
+          ? `✓ Bet placed on ${okCount} tile${okCount > 1 ? "s" : ""} · TX ${shortTx}`
+          : `✓ Bet placed on ${okCount} tile${okCount > 1 ? "s" : ""}`
+      );
+      setLastTxHash(lastTxHash);
       selectedTilesRef.current = new Set();
       setSelectedTilesState(new Set());
       loadMyBets();
@@ -394,7 +482,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
     } else if (errMsg) {
       setToast(`❌ ${errMsg}`);
     }
-    setTimeout(() => setToast(null), 3500);
+    setTimeout(() => setToast(null), 6000);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addr, loadMyBets, loadStatus]);
 
@@ -652,7 +740,19 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           fontWeight: 900, fontSize: 14, letterSpacing: ".04em",
           zIndex: 1000,
           animation: "fade-in .3s ease-out",
-        }}>{toast}</div>
+        }}>
+          <span>{toast}</span>
+          {lastTxHash && (
+            <a
+              href={`${EXPLORER_TX}/${lastTxHash}`}
+              target="_blank"
+              rel="noreferrer"
+              style={{ marginLeft: 12, color: "#7c5cff", textDecoration: "underline", display: "inline-flex", alignItems: "center", gap: 4 }}
+            >
+              View TX <ExternalLink size={12} />
+            </a>
+          )}
+        </div>
       )}
     </div>
   );
