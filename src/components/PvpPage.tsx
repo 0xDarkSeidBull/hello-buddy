@@ -686,7 +686,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
-        <MyBetsHistory address={addr} refreshKey={myBetsRefresh} />
+        
 
       </div>
 
