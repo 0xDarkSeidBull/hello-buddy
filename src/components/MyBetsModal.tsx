@@ -134,7 +134,7 @@ export default function MyBetsModal({
         <HistoryIcon size={14} /> My Bets
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
           onClick={() => setOpen(false)}
           style={{
@@ -247,7 +247,8 @@ export default function MyBetsModal({
             )}
           </div>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
