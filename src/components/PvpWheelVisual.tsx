@@ -307,8 +307,12 @@ export default function PvpWheelVisual({
       };
     }
     if (isMine) {
-      return { fill: "rgba(34,197,94,0.18)", stroke: "rgba(34,197,94,0.9)", strokeWidth: 2, glow: "drop-shadow(0 0 12px rgba(34,197,94,0.4))", opacity: 1, transform: "none" };
+      return { fill: "rgba(34,197,94,0.22)", stroke: "rgba(34,197,94,0.95)", strokeWidth: 2, glow: "drop-shadow(0 0 12px rgba(34,197,94,0.5))", opacity: 1, transform: "none" };
     }
+    if (selectedTiles?.has(tileLabel)) {
+      return { fill: "rgba(249,115,22,0.35)", stroke: "rgba(249,115,22,1)", strokeWidth: 2, glow: "drop-shadow(0 0 14px rgba(249,115,22,0.55))", opacity: 1, transform: "none" };
+    }
+
     if (tilesWithBets?.has(tileLabel)) {
       return { fill: "rgba(168,85,247,0.1)", stroke: "rgba(168,85,247,0.5)", strokeWidth: 1.2, glow: "", opacity: 0.95, transform: "none" };
     }
