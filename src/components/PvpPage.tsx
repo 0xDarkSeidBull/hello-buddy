@@ -444,7 +444,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
     : 0;
 
   return (
-    <div className="app zone-mode" style={{ minHeight: "100vh" }}>
+    <div className="app zone-mode" style={{ minHeight: "100vh", background: "#f3f4f6", backgroundImage: "linear-gradient(rgba(15,23,42,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(15,23,42,.06) 1px,transparent 1px)", backgroundSize: "32px 32px" }}>
       <style>{`@keyframes pvpSpinIn { from { transform: rotate(-360deg); } to { transform: rotate(0); } }`}</style>
       <div className="topbar">
         <div className="logo" style={{ cursor: "pointer" }} onClick={onBack}>
@@ -529,8 +529,8 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
         {/* Below: Drand + Ended Rounds */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 14, marginTop: 18 }}>
           <div style={{
-            background: "#ffffff", border: "1px solid #0f172a",
-            borderRadius: 16, padding: 18, color: "#0f172a",
+            background: "#ffffff", border: "2px solid #0f172a",
+            borderRadius: 14, padding: 18, boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)", color: "#0f172a",
             display: "flex", flexDirection: "column", gap: 12,
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
@@ -562,8 +562,8 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
             )}
           </div>
           <div style={{
-            background: "#ffffff", border: "1px solid #0f172a",
-            borderRadius: 16, padding: 18, color: "#0f172a",
+            background: "#ffffff", border: "2px solid #0f172a",
+            borderRadius: 14, padding: 18, boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)", color: "#0f172a",
             display: "flex", flexDirection: "column", gap: 12,
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
