@@ -163,7 +163,7 @@ export default function MyBetsModal({
             </div>
 
             {/* Body */}
-            <div style={{ padding: "22px 22px 8px", overflowY: "auto", flex: 1 }}>
+            <div style={{ padding: "22px 22px 8px", overflowY: "auto", flex: "1 1 auto", minHeight: 0 }}>
               {!address ? (
                 <Empty>Connect wallet to see your bets</Empty>
               ) : loading && rounds.length === 0 ? (
