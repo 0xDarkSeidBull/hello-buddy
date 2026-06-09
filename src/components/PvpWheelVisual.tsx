@@ -614,7 +614,70 @@ export default function PvpWheelVisual({
         .pvp-sol-loader span:nth-child(2) { background: linear-gradient(90deg, #22d3ee, #34d399); transform: skewX(-22deg) translateX(-8px); }
         .pvp-sol-loader span:nth-child(3) { background: linear-gradient(90deg, #a855f7, #7c3aed); transform: skewX(-22deg) translateX(8px); }
         @keyframes pvpLogoIn { from { opacity: 0; transform: scale(.86); } 35% { opacity: 1; } to { opacity: 1; transform: scale(1); } }
+        @keyframes bonanzaPulse { 0%,100% { transform: scale(1); text-shadow: 0 0 30px rgba(253,224,71,.95), 0 0 60px rgba(251,191,36,.7); } 50% { transform: scale(1.06); text-shadow: 0 0 50px rgba(253,224,71,1), 0 0 100px rgba(251,191,36,.9); } }
+        @keyframes bonanzaBorder { 0%,100% { box-shadow: inset 0 0 0 4px rgba(253,224,71,1), 0 0 60px rgba(251,191,36,.7); } 50% { box-shadow: inset 0 0 0 8px rgba(253,224,71,1), 0 0 100px rgba(251,191,36,.95); } }
+        @keyframes bonanzaRain { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+        @keyframes bonanzaFlash { 0%,100% { opacity: 0.85; } 50% { opacity: 0.55; } }
       `}</style>
+      {goldFlash && createPortal(
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 99998,
+          background: "radial-gradient(circle, rgba(253,224,71,.9), rgba(251,191,36,.55))",
+          pointerEvents: "none",
+        }} />, document.body
+      )}
+      {bonanzaOverlay && createPortal(
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 99999,
+          background: "radial-gradient(ellipse at center, #7c2d12 0%, #000 80%)",
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          pointerEvents: "none", overflow: "hidden",
+          animation: "bonanzaBorder 1.6s ease-in-out infinite",
+        }}>
+          {/* gold rain */}
+          {Array.from({ length: 50 }).map((_, i) => {
+            const left = Math.random() * 100;
+            const delay = Math.random() * 2;
+            const dur = 2 + Math.random() * 2;
+            const sz = 8 + Math.random() * 14;
+            return (
+              <div key={i} style={{
+                position: "absolute", left: `${left}vw`, top: 0,
+                fontSize: sz, color: "#fde047",
+                animation: `bonanzaRain ${dur}s linear ${delay}s infinite`,
+                textShadow: "0 0 8px rgba(253,224,71,.9)",
+              }}>{Math.random() > 0.5 ? "✨" : "⭐"}</div>
+            );
+          })}
+          <div style={{
+            position: "relative", zIndex: 2, textAlign: "center",
+            fontFamily: "'Space Grotesk', system-ui, sans-serif",
+          }}>
+            <div style={{
+              fontSize: "clamp(36px, 7vw, 88px)", fontWeight: 900,
+              color: "#fde047", letterSpacing: ".04em",
+              animation: "bonanzaPulse 1.1s ease-in-out infinite",
+              marginBottom: 16,
+            }}>🎉 BONANZA ROUND! 🎉</div>
+            <div style={{
+              fontSize: "clamp(28px, 5vw, 56px)", fontWeight: 900,
+              color: "#fbbf24", marginBottom: 20,
+              textShadow: "0 0 20px rgba(251,191,36,.8)",
+            }}>🏆 TILE {winnerTile ?? winningTileRef.current} WINS!</div>
+            <div style={{
+              fontSize: "clamp(18px, 2.4vw, 28px)", fontWeight: 800,
+              color: "#00d4ff", marginBottom: 14,
+              textShadow: "0 0 14px rgba(0,212,255,.7)",
+            }}>+10,000 POINTS awarded to all winners!</div>
+            <div style={{
+              fontSize: "clamp(13px, 1.4vw, 18px)", fontWeight: 700,
+              color: "#94a3b8", letterSpacing: ".06em",
+              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+            }}>POOL · {pot.toFixed(3)} zkLTC</div>
+          </div>
+        </div>, document.body
+      )}
     </div>
   );
 }
+
