@@ -249,8 +249,8 @@ function RoundCard({ r }: { r: MyRound }) {
         borderRadius: 14, padding: "16px 14px 14px",
         boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)",
         display: "flex", flexDirection: "column", gap: 10,
-        minHeight: 380,
       }}>
+
         <div className="mono" style={{
           fontSize: 18, fontWeight: 900, color: "#0f172a",
           paddingBottom: 8, borderBottom: "1.5px dashed rgba(15,23,42,.18)",
