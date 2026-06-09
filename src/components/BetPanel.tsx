@@ -59,12 +59,17 @@ export default function BetPanel({
   const totalAll = total * roundsNum;
   const lockedUI = isLocked || isCooldown;
 
+  const allTiles = React.useMemo(() => Array.from({ length: TILES }, (_, i) => i + 1), []);
   const setAll = (tiles: number[]) => setSelectedTiles(new Set(tiles));
-  const allTiles = Array.from({ length: TILES }, (_, i) => i + 1);
   const setEven = () => setAll(allTiles.filter((n) => n % 2 === 0));
   const setOdd = () => setAll(allTiles.filter((n) => n % 2 === 1));
   const setAllSel = () => setAll(allTiles);
   const clearSel = () => setAll([]);
+
+  // Derived active filter (no async state — instant + race-free)
+  const isAllActive = count === TILES;
+  const isEvenActive = !isAllActive && count === TILES / 2 && Array.from(selectedTiles).every((n) => n % 2 === 0);
+  const isOddActive = !isAllActive && count === TILES / 2 && Array.from(selectedTiles).every((n) => n % 2 === 1);
   const bumpAmt = (delta: number) => {
     const next = Math.max(0, +(amt + delta).toFixed(4));
     setAmount(String(next));
