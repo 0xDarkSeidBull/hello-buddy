@@ -613,7 +613,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
                 isCooldown={isCooldown}
                 cooldownMs={cooldownMsLeft || cooldownSeconds * 1000}
                 players={myBets.filter((b) => b.round_id === status?.round_id).length}
-                pot={status?.total_pool ?? 0}
+                pot={animationWinner?.total_pool ?? status?.total_pool ?? 0}
                 winningTile={animationWinner?.winning_tile ?? null}
                 animationRoundId={animationWinner?.round_id ?? null}
                 myTiles={myTilesThisRound}
