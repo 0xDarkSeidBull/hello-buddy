@@ -72,7 +72,9 @@ type EndedRound = {
   drand_verify_url?: string;
   drand_round?: number | string;
   payouts?: Payout[];
+  is_bonanza?: number;
 };
+
 
 type RoundDetails = {
   round_id: number;
