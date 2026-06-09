@@ -531,47 +531,70 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           <div style={{
             background: "#0a0a0c", border: "1px solid rgba(255,255,255,.08)",
             borderRadius: 16, padding: 18, color: "#e4e4e7",
+            display: "flex", flexDirection: "column", gap: 12,
           }}>
-            <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#a1a1aa", fontWeight: 800, marginBottom: 8 }}>
-              <Shield size={11} style={{ verticalAlign: "middle", marginRight: 4, color: "#fb923c" }} /> DRAND TARGET
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+              <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#a1a1aa", fontWeight: 800 }}>
+                <Shield size={11} style={{ verticalAlign: "middle", marginRight: 4, color: "#fb923c" }} />
+                DRAND · <span style={{ color: "#fb923c" }}>TARGET</span>
+              </div>
             </div>
-            <div style={{ fontFamily: "ui-monospace,monospace", fontWeight: 900, fontSize: 20, color: "#fff", marginBottom: 12 }}>
-              #{status?.drand_target_round ?? "—"}
+            <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 10 }}>
+              <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#71717a", fontWeight: 800, marginBottom: 6 }}>
+                ROUND NUMBER
+              </div>
+              <div style={{ fontFamily: "ui-monospace,monospace", fontWeight: 900, fontSize: 22, color: "#fff" }}>
+                #{status?.drand_target_round ?? "—"}
+              </div>
             </div>
             {status?.drand_verify_url && (
               <a href={status.drand_verify_url} target="_blank" rel="noreferrer"
                 style={{
-                  display: "inline-flex", alignItems: "center", gap: 6,
+                  display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  width: "100%", marginTop: 2,
                   background: "#fb923c", color: "#1c1917", textDecoration: "none",
-                  border: 0, borderRadius: 8,
-                  padding: "8px 12px", fontSize: 11, fontWeight: 900,
-                  letterSpacing: ".12em", textTransform: "uppercase",
+                  border: 0, borderRadius: 10,
+                  padding: "12px", fontSize: 12, fontWeight: 900,
+                  letterSpacing: ".14em", textTransform: "uppercase",
                 }}>
-                Verify on Drand <ExternalLink size={11} />
+                Verify on Drand <ExternalLink size={12} />
               </a>
             )}
           </div>
           <div style={{
             background: "#0a0a0c", border: "1px solid rgba(255,255,255,.08)",
             borderRadius: 16, padding: 18, color: "#e4e4e7",
+            display: "flex", flexDirection: "column", gap: 12,
           }}>
-            <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#a1a1aa", fontWeight: 800, marginBottom: 10 }}>
-              <History size={11} style={{ verticalAlign: "middle", marginRight: 4, color: "#fb923c" }} /> ENDED ROUNDS
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+              <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#a1a1aa", fontWeight: 800 }}>
+                <History size={11} style={{ verticalAlign: "middle", marginRight: 4, color: "#fb923c" }} />
+                ENDED · <span style={{ color: "#fb923c" }}>ROUNDS</span>
+              </div>
+              <div style={{
+                fontSize: 9, padding: "3px 8px", borderRadius: 999,
+                background: "rgba(249,115,22,.15)", color: "#fb923c",
+                border: "1px solid rgba(249,115,22,.45)", fontWeight: 800, letterSpacing: ".12em",
+              }}>{history.length} TOTAL</div>
             </div>
-            {history.length === 0 && <div style={{ fontSize: 12, color: "#52525b" }}>No settled rounds yet.</div>}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {history.map((r) => (
-                <button key={r.round_id} onClick={() => openVerify(r.round_id)}
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: 6,
-                    background: "rgba(249,115,22,.10)", color: "#fb923c",
-                    border: "1px solid rgba(249,115,22,.45)", borderRadius: 8,
-                    padding: "6px 10px", fontFamily: "ui-monospace,monospace",
-                    fontWeight: 800, fontSize: 11, cursor: "pointer",
-                  }}>
-                  #{r.round_id} · Tile {r.winning_tile}
-                </button>
-              ))}
+            <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 10 }}>
+              {history.length === 0 ? (
+                <div style={{ fontSize: 11, color: "#52525b" }}>No settled rounds yet.</div>
+              ) : (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                  {history.map((r) => (
+                    <button key={r.round_id} onClick={() => openVerify(r.round_id)}
+                      style={{
+                        fontSize: 11, fontFamily: "ui-monospace,monospace", fontWeight: 800,
+                        background: "rgba(249,115,22,.12)", color: "#fb923c",
+                        border: "1px solid rgba(249,115,22,.4)", borderRadius: 6,
+                        padding: "3px 7px", cursor: "pointer",
+                      }}>
+                      #{r.round_id} · Tile {r.winning_tile}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
