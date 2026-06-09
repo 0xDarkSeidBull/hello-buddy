@@ -97,9 +97,9 @@ export default function BetPanel({
     <button
       onClick={onClick}
       style={{
-        background: active ? "#27272a" : "transparent",
-        color: "#e4e4e7",
-        border: "1px solid rgba(255,255,255,.18)",
+        background: active ? "#e2e8f0" : "transparent",
+        color: "#1f2937",
+        border: "1px solid rgba(15,23,42,.15)",
         borderRadius: 6,
         padding: "6px 12px",
         fontFamily: "ui-monospace,monospace",
@@ -113,11 +113,11 @@ export default function BetPanel({
   return (
     <div
       style={{
-        background: "#0a0a0c",
-        border: "1px solid rgba(255,255,255,.08)",
+        background: "#ffffff",
+        border: "1px solid rgba(15,23,42,.10)",
         borderRadius: 16,
         padding: 18,
-        color: "#e4e4e7",
+        color: "#1f2937",
         display: "flex",
         flexDirection: "column",
         gap: 14,
@@ -125,7 +125,7 @@ export default function BetPanel({
     >
       {/* HEADER */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-        <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#a1a1aa", fontWeight: 800 }}>
+        <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#64748b", fontWeight: 800 }}>
           ROUND #{roundId ?? "—"} · <span style={{ color: "#fb923c" }}>{statusLabel}</span>
         </div>
         {autoActive && (
@@ -138,7 +138,7 @@ export default function BetPanel({
       </div>
 
       {/* TABS */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid rgba(15,23,42,.10)" }}>
         {(["manual", "auto"] as Mode[]).map((m) => (
           <button
             key={m}
@@ -146,7 +146,7 @@ export default function BetPanel({
             style={{
               background: "transparent", border: 0, cursor: "pointer",
               padding: "10px 0",
-              color: mode === m ? "#fb923c" : "#71717a",
+              color: mode === m ? "#fb923c" : "#6b7280",
               fontWeight: 800, letterSpacing: ".24em", fontSize: 12,
               borderBottom: mode === m ? "2px solid #fb923c" : "2px solid transparent",
               textTransform: "uppercase",
@@ -157,16 +157,16 @@ export default function BetPanel({
 
       {/* TILES SELECTION */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-        <div style={{ fontSize: 11, letterSpacing: ".14em", color: "#a1a1aa", fontWeight: 700 }}>
-          {mode === "auto" ? "BLOCKS" : "TILES"} <b style={{ color: "#fff" }}>{count}</b> selected
+        <div style={{ fontSize: 11, letterSpacing: ".14em", color: "#64748b", fontWeight: 700 }}>
+          {mode === "auto" ? "BLOCKS" : "TILES"} <b style={{ color: "#0f172a" }}>{count}</b> selected
         </div>
         <div style={{ display: "flex", gap: 6 }}>
           <QuickBtn label="Even" onClick={setEven} active={isEvenActive} />
           <QuickBtn label="Odd" onClick={setOdd} active={isOddActive} />
           <QuickBtn label="All" onClick={setAllSel} active={isAllActive} />
           <button onClick={clearSel} title="Clear" style={{
-            background: "transparent", border: "1px solid rgba(255,255,255,.18)",
-            color: "#a1a1aa", borderRadius: 6, padding: "6px 10px", cursor: "pointer", fontWeight: 700,
+            background: "transparent", border: "1px solid rgba(15,23,42,.15)",
+            color: "#64748b", borderRadius: 6, padding: "6px 10px", cursor: "pointer", fontWeight: 700,
           }}>×</button>
         </div>
       </div>
@@ -174,16 +174,16 @@ export default function BetPanel({
       {/* AMOUNT */}
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-          <div style={{ fontSize: 11, letterSpacing: ".14em", color: "#a1a1aa", fontWeight: 700 }}>
-            {mode === "auto" ? "zkLTC" : "AMOUNT"} <span style={{ color: "#52525b" }}>· MIN 0.01</span>
+          <div style={{ fontSize: 11, letterSpacing: ".14em", color: "#64748b", fontWeight: 700 }}>
+            {mode === "auto" ? "zkLTC" : "AMOUNT"} <span style={{ color: "#94a3b8" }}>· MIN 0.01</span>
           </div>
           <div style={{ display: "flex", gap: 6 }}>
             <QuickBtn label="+0.01" onClick={() => bumpAmt(0.01)} />
             <QuickBtn label="+0.1" onClick={() => bumpAmt(0.1)} />
             <QuickBtn label="+1" onClick={() => bumpAmt(1)} />
             <button onClick={() => setAmount("0")} style={{
-              background: "transparent", border: "1px solid rgba(255,255,255,.18)",
-              color: "#a1a1aa", borderRadius: 6, padding: "6px 10px", cursor: "pointer", fontWeight: 700,
+              background: "transparent", border: "1px solid rgba(15,23,42,.15)",
+              color: "#64748b", borderRadius: 6, padding: "6px 10px", cursor: "pointer", fontWeight: 700,
             }}>×</button>
           </div>
         </div>
@@ -196,7 +196,7 @@ export default function BetPanel({
             onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))}
             style={{
               background: "transparent", border: 0, outline: 0,
-              color: "#fff", fontWeight: 800, fontSize: 28,
+              color: "#0f172a", fontWeight: 800, fontSize: 28,
               fontFamily: "ui-monospace,monospace",
               width: "100%",
             }}
@@ -210,7 +210,7 @@ export default function BetPanel({
         <>
           <div style={{
             display: "flex", justifyContent: "space-between", alignItems: "center",
-            paddingTop: 10, borderTop: "1px solid rgba(255,255,255,.06)",
+            paddingTop: 10, borderTop: "1px solid rgba(15,23,42,.08)",
           }}>
             <div style={{ fontWeight: 800, fontSize: 13 }}>Rounds</div>
             <input
@@ -220,7 +220,7 @@ export default function BetPanel({
               onChange={(e) => setRounds(e.target.value.replace(/[^\d]/g, ""))}
               style={{
                 background: "transparent", border: 0, outline: 0,
-                color: "#fff", fontWeight: 800, fontSize: 16, textAlign: "right",
+                color: "#0f172a", fontWeight: 800, fontSize: 16, textAlign: "right",
                 width: 60, fontFamily: "ui-monospace,monospace",
               }}
             />
@@ -231,21 +231,21 @@ export default function BetPanel({
               onClick={() => setAutoReload((v) => !v)}
               style={{
                 width: 38, height: 22, borderRadius: 999,
-                background: autoReload ? "#fb923c" : "#27272a",
+                background: autoReload ? "#fb923c" : "#e2e8f0",
                 border: 0, cursor: "pointer", position: "relative",
               }}
             >
               <span style={{
                 position: "absolute", top: 2, left: autoReload ? 18 : 2,
-                width: 18, height: 18, borderRadius: "50%", background: "#fff",
+                width: 18, height: 18, borderRadius: "50%", background: "#0f172a",
                 transition: "left 160ms ease",
               }} />
             </button>
           </div>
-          <div style={{ fontSize: 11, color: "#71717a", lineHeight: 1.45, marginTop: -6 }}>
+          <div style={{ fontSize: 11, color: "#6b7280", lineHeight: 1.45, marginTop: -6 }}>
             Round zkLTC rewards can be added back to this auto budget before the next round.
           </div>
-          <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 10, display: "flex", flexDirection: "column", gap: 6 }}>
+          <div style={{ borderTop: "1px solid rgba(15,23,42,.08)", paddingTop: 10, display: "flex", flexDirection: "column", gap: 6 }}>
             <Row label="Total per round" value={total.toFixed(5)} />
             <Row label="Total" value={totalAll.toFixed(5)} />
           </div>
@@ -253,12 +253,12 @@ export default function BetPanel({
       )}
 
       {/* MY BETS */}
-      <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 10 }}>
-        <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#71717a", fontWeight: 800, marginBottom: 6 }}>
+      <div style={{ borderTop: "1px solid rgba(15,23,42,.08)", paddingTop: 10 }}>
+        <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#6b7280", fontWeight: 800, marginBottom: 6 }}>
           MY BETS THIS ROUND
         </div>
         {myBets.length === 0 ? (
-          <div style={{ fontSize: 11, color: "#52525b" }}>No bets yet this round.</div>
+          <div style={{ fontSize: 11, color: "#94a3b8" }}>No bets yet this round.</div>
         ) : (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
             {myBets.map((b) => (
@@ -297,7 +297,7 @@ export default function BetPanel({
       ) : (
         autoActive ? (
           <button onClick={onStopAuto} style={{
-            width: "100%", background: "#ef4444", color: "#fff",
+            width: "100%", background: "#ef4444", color: "#0f172a",
             border: 0, borderRadius: 10, padding: "14px",
             fontWeight: 900, fontSize: 14, letterSpacing: ".14em",
             textTransform: "uppercase", cursor: "pointer",
@@ -325,8 +325,8 @@ export default function BetPanel({
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-      <span style={{ fontSize: 12, color: "#a1a1aa" }}>{label}</span>
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "ui-monospace,monospace", fontWeight: 800, color: "#fff" }}>
+      <span style={{ fontSize: 12, color: "#64748b" }}>{label}</span>
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "ui-monospace,monospace", fontWeight: 800, color: "#0f172a" }}>
         <Coin size={14} /> {value}
       </span>
     </div>

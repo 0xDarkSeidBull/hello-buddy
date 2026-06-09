@@ -491,7 +491,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           {/* WHEEL */}
           <div style={{
             background: "radial-gradient(ellipse at center, #0f0f12 0%, #050507 75%)",
-            border: "1px solid rgba(255,255,255,.08)", borderRadius: 22,
+            border: "1px solid rgba(15,23,42,.10)", borderRadius: 22,
             boxShadow: "0 30px 60px -20px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.02)",
             padding: 24,
             display: "flex", justifyContent: "center", alignItems: "center",
@@ -529,21 +529,21 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
         {/* Below: Drand + Ended Rounds */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 14, marginTop: 18 }}>
           <div style={{
-            background: "#0a0a0c", border: "1px solid rgba(255,255,255,.08)",
-            borderRadius: 16, padding: 18, color: "#e4e4e7",
+            background: "#ffffff", border: "1px solid rgba(15,23,42,.10)",
+            borderRadius: 16, padding: 18, color: "#1f2937",
             display: "flex", flexDirection: "column", gap: 12,
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-              <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#a1a1aa", fontWeight: 800 }}>
+              <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#64748b", fontWeight: 800 }}>
                 <Shield size={11} style={{ verticalAlign: "middle", marginRight: 4, color: "#fb923c" }} />
                 DRAND · <span style={{ color: "#fb923c" }}>TARGET</span>
               </div>
             </div>
-            <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 10 }}>
-              <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#71717a", fontWeight: 800, marginBottom: 6 }}>
+            <div style={{ borderTop: "1px solid rgba(15,23,42,.08)", paddingTop: 10 }}>
+              <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#6b7280", fontWeight: 800, marginBottom: 6 }}>
                 ROUND NUMBER
               </div>
-              <div style={{ fontFamily: "ui-monospace,monospace", fontWeight: 900, fontSize: 22, color: "#fff" }}>
+              <div style={{ fontFamily: "ui-monospace,monospace", fontWeight: 900, fontSize: 22, color: "#0f172a" }}>
                 #{status?.drand_target_round ?? "—"}
               </div>
             </div>
@@ -562,12 +562,12 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
             )}
           </div>
           <div style={{
-            background: "#0a0a0c", border: "1px solid rgba(255,255,255,.08)",
-            borderRadius: 16, padding: 18, color: "#e4e4e7",
+            background: "#ffffff", border: "1px solid rgba(15,23,42,.10)",
+            borderRadius: 16, padding: 18, color: "#1f2937",
             display: "flex", flexDirection: "column", gap: 12,
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-              <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#a1a1aa", fontWeight: 800 }}>
+              <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#64748b", fontWeight: 800 }}>
                 <History size={11} style={{ verticalAlign: "middle", marginRight: 4, color: "#fb923c" }} />
                 ENDED · <span style={{ color: "#fb923c" }}>ROUNDS</span>
               </div>
@@ -577,9 +577,9 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
                 border: "1px solid rgba(249,115,22,.45)", fontWeight: 800, letterSpacing: ".12em",
               }}>{history.length} TOTAL</div>
             </div>
-            <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 10 }}>
+            <div style={{ borderTop: "1px solid rgba(15,23,42,.08)", paddingTop: 10 }}>
               {history.length === 0 ? (
-                <div style={{ fontSize: 11, color: "#52525b" }}>No settled rounds yet.</div>
+                <div style={{ fontSize: 11, color: "#94a3b8" }}>No settled rounds yet.</div>
               ) : (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                   {history.map((r) => (
