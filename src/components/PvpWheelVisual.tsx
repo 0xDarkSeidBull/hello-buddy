@@ -343,14 +343,13 @@ export default function PvpWheelVisual({
   return (
     <div className="flex flex-col items-center" style={{ width: size, maxWidth: "100%" }}>
       <div
-        className="relative w-full aspect-square flex items-center justify-center p-4 rounded-full overflow-visible"
+        className="relative w-full aspect-square flex items-center justify-center p-4 overflow-visible"
         style={{
-          border: "1px dashed rgba(63,63,70,0.7)",
-          background: "rgba(9,9,11,0.4)",
-          boxShadow: "0 25px 50px -12px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02)",
+          background: "transparent",
           animation: shake ? "pvpShake 0.5s ease-in-out" : undefined,
         }}
       >
+
         {flash && (
           <div style={{
             position: "absolute", inset: 0, borderRadius: "50%",
