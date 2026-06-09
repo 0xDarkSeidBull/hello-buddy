@@ -13,7 +13,7 @@ const HISTORY_URL = `${API}/bets/history`;
 const CONFIRM_URL = `${API}/bets/confirm`;
 const TILES = 30;
 
-const CONTRACT_ADDRESS = "0xf82776F9b7FcC338d6a677F138f55eE0Cf26807A";
+const CONTRACT_ADDRESS = "0xfC4f072f48d0981BfdEED048356c0Bf80d7799Aa";
 const CHAIN_ID = 4441;
 const CHAIN_ID_HEX = "0x1159";
 const RPC_URL = "https://liteforge.rpc.caldera.xyz/http";
