@@ -333,23 +333,16 @@ export default function PvpWheelVisual({
             const tileLabel = tile.id + 1;
             const isMine = myTiles.has(tileLabel);
             const interactive = isOpen && !animating;
-            const scatterActive = phase === "scatter" || phase === "logo";
-            const scatterRad = (tile.middleDegrees - 90) * Math.PI / 180;
-            const scatterDistance = phase === "logo" ? 128 : 58;
-            const scatterTransform = scatterActive
-              ? `translate(${Math.cos(scatterRad) * scatterDistance}px, ${Math.sin(scatterRad) * scatterDistance}px) rotate(${tile.middleDegrees * 0.12}deg) scale(${phase === "logo" ? 0.94 : 1})`
-              : s.transform;
-            const phaseOpacity = phase === "logo" && tileLabel > 12 && tileLabel < 23 ? 0.08 : s.opacity;
             return (
               <g
                 key={tile.id}
                 style={{
                   cursor: interactive ? "pointer" : "default",
                   filter: s.glow,
-                  transition: "filter 180ms ease, transform 700ms cubic-bezier(.2,.9,.2,1), opacity 450ms ease",
-                  transform: scatterTransform,
+                  transition: "filter 180ms ease, transform 400ms cubic-bezier(.2,.9,.2,1), opacity 240ms ease",
+                  transform: s.transform,
                   transformOrigin: "290px 290px",
-                  opacity: phaseOpacity,
+                  opacity: s.opacity,
                 }}
                 onPointerEnter={() => onTileEnter(tileLabel)}
                 onPointerLeave={onTileLeave}
@@ -365,7 +358,7 @@ export default function PvpWheelVisual({
                   stroke={s.stroke}
                   strokeWidth={s.strokeWidth}
                   opacity={s.opacity}
-                  style={{ transition: "fill 160ms ease, stroke 160ms ease, opacity 160ms ease" }}
+                  style={{ transition: "fill 140ms ease, stroke 140ms ease, opacity 140ms ease" }}
                 />
                 {isMine && (
                   <circle cx={tile.labelX} cy={tile.labelY - 8} r={3} fill="#22c55e">
@@ -386,13 +379,6 @@ export default function PvpWheelVisual({
           })}
         </svg>
 
-        {phase === "logo" && (
-          <div className="pvp-sol-loader" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-        )}
 
         {/* HOVER TOOLTIP */}
         {tooltipVisible && tooltipTile != null && tooltipPos && (
