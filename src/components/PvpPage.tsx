@@ -467,7 +467,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 22, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "320px 1fr 320px", gap: 22, alignItems: "start" }}>
           {/* BET PANEL */}
           <BetPanel
             roundId={status?.round_id ?? null}
@@ -524,10 +524,50 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
               }}
             />
           </div>
+
+          {/* ENDED ROUNDS (right column) */}
+          <div style={{
+            background: "#ffffff", border: "2px solid #0f172a",
+            borderRadius: 14, padding: 18, boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)", color: "#0f172a",
+            display: "flex", flexDirection: "column", gap: 12,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+              <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#475569", fontWeight: 800 }}>
+                <History size={11} style={{ verticalAlign: "middle", marginRight: 4, color: "#7c5cff" }} />
+                ENDED · <span style={{ color: "#7c5cff" }}>ROUNDS</span>
+              </div>
+              <div style={{
+                fontSize: 9, padding: "3px 8px", borderRadius: 999,
+                background: "rgba(124,92,255,.12)", color: "#7c5cff",
+                border: "1px solid rgba(124,92,255,.4)", fontWeight: 800, letterSpacing: ".12em",
+              }}>{history.length} TOTAL</div>
+            </div>
+            <div style={{ borderTop: "1px solid rgba(15,23,42,.10)", paddingTop: 10, maxHeight: 560, overflowY: "auto" }}>
+              {history.length === 0 ? (
+                <div style={{ fontSize: 11, color: "#64748b" }}>No settled rounds yet.</div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {history.map((r) => (
+                    <div key={r.round_id}
+                      style={{
+                        background: "var(--bg-2)", border: "1px solid var(--line)",
+                        borderRadius: 11, padding: "10px 12px",
+                        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
+                      }}>
+                      <span className="mono" style={{ color: "#22d3ee", fontWeight: 700, fontSize: 13 }}>
+                        #{r.round_id} · Tile {r.winning_tile}
+                      </span>
+                      <button className="verify-btn" onClick={() => openVerify(r.round_id)}>Verify</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Below: Drand + Ended Rounds */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 14, marginTop: 18 }}>
+        {/* Below: Drand Target (compact, left aligned under bet panel) */}
+        <div style={{ display: "grid", gridTemplateColumns: "320px 1fr 320px", gap: 22, marginTop: 18 }}>
           <div style={{
             background: "#ffffff", border: "2px solid #0f172a",
             borderRadius: 14, padding: 18, boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)", color: "#0f172a",
@@ -555,45 +595,8 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
               </a>
             )}
           </div>
-          <div style={{
-            background: "#ffffff", border: "2px solid #0f172a",
-            borderRadius: 14, padding: 18, boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)", color: "#0f172a",
-            display: "flex", flexDirection: "column", gap: 12,
-          }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-              <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#475569", fontWeight: 800 }}>
-                <History size={11} style={{ verticalAlign: "middle", marginRight: 4, color: "#7c5cff" }} />
-                ENDED · <span style={{ color: "#7c5cff" }}>ROUNDS</span>
-              </div>
-              <div style={{
-                fontSize: 9, padding: "3px 8px", borderRadius: 999,
-                background: "rgba(124,92,255,.12)", color: "#7c5cff",
-                border: "1px solid rgba(124,92,255,.4)", fontWeight: 800, letterSpacing: ".12em",
-              }}>{history.length} TOTAL</div>
-            </div>
-            <div style={{ borderTop: "1px solid rgba(15,23,42,.10)", paddingTop: 10 }}>
-              {history.length === 0 ? (
-                <div style={{ fontSize: 11, color: "#64748b" }}>No settled rounds yet.</div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {history.map((r) => (
-                    <div key={r.round_id}
-                      style={{
-                        background: "var(--bg-2)", border: "1px solid var(--line)",
-                        borderRadius: 11, padding: "10px 12px",
-                        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
-                      }}>
-                      <span className="mono" style={{ color: "#22d3ee", fontWeight: 700, fontSize: 13 }}>
-                        #{r.round_id} · Tile {r.winning_tile}
-                      </span>
-                      <button className="verify-btn" onClick={() => openVerify(r.round_id)}>Verify</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
         </div>
+      </div>
       </div>
 
 
