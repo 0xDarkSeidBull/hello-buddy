@@ -498,9 +498,9 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
               alignSelf: "center", minWidth: 360, maxWidth: 520, width: "100%",
             }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#475569", fontWeight: 800 }}>
-                  <Shield size={11} style={{ verticalAlign: "middle", marginRight: 4, color: "#7c5cff" }} />
-                  DRAND · <span style={{ color: "#7c5cff" }}>TARGET</span> · #{status?.drand_target_round ?? "—"}
+                <div className="side-head" style={{ fontSize: 13, marginBottom: 0 }}>
+                  <Shield size={14} style={{ verticalAlign: "middle", marginRight: 6, color: "#7c5cff" }} />
+                  Drand · <span style={{ color: "#7c5cff" }}>Target</span> · #{status?.drand_target_round ?? "—"}
                 </div>
               </div>
               {status?.drand_verify_url && (
