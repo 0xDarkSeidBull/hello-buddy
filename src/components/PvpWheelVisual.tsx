@@ -397,8 +397,8 @@ export default function PvpWheelVisual({
                   x={tile.labelX}
                   y={tile.labelY + 4}
                   textAnchor="middle"
-                  fill={winnerTile === tileLabel ? "#fff" : "#a1a1aa"}
-                  style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", fontSize: "0.65rem", fontWeight: winnerTile === tileLabel ? 900 : 400 }}
+                  fill={winnerTile === tileLabel ? "#fff" : "#0f172a"}
+                  style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", fontSize: "0.65rem", fontWeight: winnerTile === tileLabel ? 900 : 600 }}
                 >
                   {tileLabel}
                 </text>
