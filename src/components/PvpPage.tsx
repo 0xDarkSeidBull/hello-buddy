@@ -488,41 +488,66 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
             onStopAuto={() => setAutoCfg(null)}
           />
 
-          {/* WHEEL */}
-          <div style={{
-            background: "radial-gradient(ellipse at center, #0f0f12 0%, #050507 75%)",
-            border: "1px solid #0f172a", borderRadius: 22,
-            boxShadow: "0 30px 60px -20px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.02)",
-            padding: 24,
-            display: "flex", justifyContent: "center", alignItems: "center",
-            position: "relative", minHeight: 600,
-          }}>
-            <PvpWheelVisual
-              size={SIZE}
-              tiles={TILES}
-              roundId={status?.round_id ?? null}
-              timeLeftMs={visibleTimeLeftMs}
-              totalRoundMs={totalRoundMsRef.current}
-              isOpen={isOpen}
-              isLocked={isLocked}
-              isCooldown={isCooldown}
-              cooldownMs={cooldownMsLeft || cooldownSeconds * 1000}
-              players={myBets.filter((b) => b.round_id === status?.round_id).length}
-              pot={status?.total_pool ?? 0}
-              winningTile={animationWinner?.winning_tile ?? null}
-              animationRoundId={animationWinner?.round_id ?? null}
-              myTiles={myTilesThisRound}
-              selectedTiles={selectedTiles}
-              onTileClick={onSegmentClick}
-              onAnimationComplete={() => {
-                console.log("[Animation] completed", animationWinner);
-                clearHistoryRetry();
-                setAnimationWinner(null);
-                pendingAnimationRoundRef.current = null;
-                prevStatusRef.current = "";
-                prevRoundRef.current = null;
-              }}
-            />
+          {/* WHEEL COLUMN: Drand card above wheel */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* DRAND TARGET — centered above wheel */}
+            <div style={{
+              background: "#ffffff", border: "2px solid #0f172a",
+              borderRadius: 14, padding: 14, boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)", color: "#0f172a",
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
+              alignSelf: "center", minWidth: 360, maxWidth: 520, width: "100%",
+            }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#475569", fontWeight: 800 }}>
+                  <Shield size={11} style={{ verticalAlign: "middle", marginRight: 4, color: "#7c5cff" }} />
+                  DRAND · <span style={{ color: "#7c5cff" }}>TARGET</span> · #{status?.drand_target_round ?? "—"}
+                </div>
+              </div>
+              {status?.drand_verify_url && (
+                <a href={status.drand_verify_url} target="_blank" rel="noreferrer"
+                  className="verify-btn"
+                  style={{ gap: 6, textDecoration: "none", whiteSpace: "nowrap" }}>
+                  Verify on Drand <ExternalLink size={12} />
+                </a>
+              )}
+            </div>
+
+            {/* WHEEL */}
+            <div style={{
+              background: "radial-gradient(ellipse at center, #0f0f12 0%, #050507 75%)",
+              border: "1px solid #0f172a", borderRadius: 22,
+              boxShadow: "0 30px 60px -20px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.02)",
+              padding: 24,
+              display: "flex", justifyContent: "center", alignItems: "center",
+              position: "relative", minHeight: 600,
+            }}>
+              <PvpWheelVisual
+                size={SIZE}
+                tiles={TILES}
+                roundId={status?.round_id ?? null}
+                timeLeftMs={visibleTimeLeftMs}
+                totalRoundMs={totalRoundMsRef.current}
+                isOpen={isOpen}
+                isLocked={isLocked}
+                isCooldown={isCooldown}
+                cooldownMs={cooldownMsLeft || cooldownSeconds * 1000}
+                players={myBets.filter((b) => b.round_id === status?.round_id).length}
+                pot={status?.total_pool ?? 0}
+                winningTile={animationWinner?.winning_tile ?? null}
+                animationRoundId={animationWinner?.round_id ?? null}
+                myTiles={myTilesThisRound}
+                selectedTiles={selectedTiles}
+                onTileClick={onSegmentClick}
+                onAnimationComplete={() => {
+                  console.log("[Animation] completed", animationWinner);
+                  clearHistoryRetry();
+                  setAnimationWinner(null);
+                  pendingAnimationRoundRef.current = null;
+                  prevStatusRef.current = "";
+                  prevRoundRef.current = null;
+                }}
+              />
+            </div>
           </div>
 
           {/* ENDED ROUNDS (right column) */}
