@@ -78,6 +78,11 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
   const [history, setHistory] = React.useState<EndedRound[]>([]);
   const [myBets, setMyBets] = React.useState<MyBet[]>([]);
   const [selectedTiles, setSelectedTilesState] = React.useState<Set<number>>(new Set());
+  const selectedTilesRef = React.useRef<Set<number>>(new Set());
+  const updateSelection = React.useCallback((next: Set<number>) => {
+    selectedTilesRef.current = next;
+    setSelectedTilesState(new Set(next));
+  }, []);
   const [placing, setPlacing] = React.useState(false);
   const [autoCfg, setAutoCfg] = React.useState<AutoConfig | null>(null);
   const lastAutoBetRoundRef = React.useRef<number | null>(null);
