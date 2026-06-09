@@ -1,9 +1,9 @@
 import React from "react";
-import { ArrowLeft, Shield, History, Wallet2, X, Lock, ExternalLink } from "lucide-react";
+import { ArrowLeft, Shield, History, ExternalLink } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import CoinImg from "./Coin";
 import PvpWheelVisual from "./PvpWheelVisual";
+import BetPanel, { AutoConfig } from "./BetPanel";
 import { sounds } from "../lib/pvpSounds";
 
 const API = "https://lit-api.test-hub.xyz";
@@ -11,6 +11,7 @@ const STATUS_URL = `${API}/bets/status`;
 const HISTORY_URL = `${API}/bets/history`;
 const PLACE_URL = `${API}/bets/place`;
 const TILES = 30;
+
 
 type Status = {
   round_id?: number | null;
@@ -76,10 +77,11 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
   const [statusFetchedAt, setStatusFetchedAt] = React.useState<number>(Date.now());
   const [history, setHistory] = React.useState<EndedRound[]>([]);
   const [myBets, setMyBets] = React.useState<MyBet[]>([]);
-  const [selectedTile, setSelectedTile] = React.useState<number | null>(null);
-  const [amount, setAmount] = React.useState("0.01");
+  const [selectedTiles, setSelectedTilesState] = React.useState<Set<number>>(new Set());
   const [placing, setPlacing] = React.useState(false);
-  const [betError, setBetError] = React.useState<string | null>(null);
+  const [autoCfg, setAutoCfg] = React.useState<AutoConfig | null>(null);
+  const lastAutoBetRoundRef = React.useRef<number | null>(null);
+
   const [verifyModal, setVerifyModal] = React.useState<{ loading: boolean; data: RoundDetails | null; error?: string; round_id: number } | null>(null);
   const [, setNow] = React.useState(Date.now());
   const [lastResolvedRound, setLastResolvedRound] = React.useState<EndedRound | null>(null);
@@ -348,55 +350,80 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
   const myBetsThisRound = myBets.filter((b) => status && b.round_id === status.round_id);
   const myTilesThisRound = new Set(myBetsThisRound.map((b) => b.tile));
 
+  const setSelectedTiles = React.useCallback((s: Set<number>) => {
+    setSelectedTilesState(s);
+  }, []);
+
   const onSegmentClick = (tile: number) => {
     if (!addr) { openConnectModal?.(); return; }
     if (isLocked || isCooldown) return;
-    if (myTilesThisRound.has(tile)) {
-      setBetError("Already bet on this tile");
-      setSelectedTile(tile);
-      return;
-    }
-    setBetError(null);
-    setSelectedTile(tile);
-    setAmount("0.01");
+    setSelectedTilesState((prev) => {
+      const next = new Set(prev);
+      if (next.has(tile)) next.delete(tile); else next.add(tile);
+      return next;
+    });
   };
 
-  const placeBet = async () => {
-    if (selectedTile == null || !addr) return;
-    if (myTilesThisRound.has(selectedTile)) { setBetError("Already bet on this tile"); return; }
-    const amt = Number(amount);
-    if (!Number.isFinite(amt) || amt <= 0) { setBetError("Enter a valid amount"); return; }
-    setPlacing(true); setBetError(null);
-    try {
-      const payload = { wallet: addr, tile: Number(selectedTile), amount: parseFloat(amount) };
-      console.log("Bet payload:", payload);
-      const r = await fetch(PLACE_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+  const placeBetsForTiles = React.useCallback(async (tiles: number[], amt: number) => {
+    if (!addr || tiles.length === 0) return;
+    setPlacing(true);
+    let okCount = 0;
+    let errMsg: string | null = null;
+    for (const tile of tiles) {
+      if (myTilesThisRound.has(tile)) continue;
+      try {
+        const r = await fetch(PLACE_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ wallet: addr, tile: Number(tile), amount: Number(amt) }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || j?.error) { errMsg = j?.error || `http_${r.status}`; }
+        else { okCount++; sounds.betPlaced(); }
+      } catch (e: any) { errMsg = e?.message || "fail"; }
+      await new Promise((res) => setTimeout(res, 100));
+    }
+    setPlacing(false);
+    if (okCount > 0) {
+      setToast(`✓ Bet placed on ${okCount} tile${okCount > 1 ? "s" : ""}`);
+      setSelectedTilesState(new Set());
+      loadMyBets();
+      loadStatus();
+    } else if (errMsg) {
+      setToast(`❌ ${errMsg}`);
+    }
+    setTimeout(() => setToast(null), 3500);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addr, loadMyBets, loadStatus]);
+
+  // AUTO BETTING — when round changes and we still have rounds left, place bets
+  React.useEffect(() => {
+    if (!autoCfg || !isOpen || !status?.round_id || !addr) return;
+    if (autoCfg.roundsLeft <= 0 && !autoCfg.autoReload) {
+      setAutoCfg(null);
+      return;
+    }
+    if (lastAutoBetRoundRef.current === status.round_id) return;
+    lastAutoBetRoundRef.current = status.round_id;
+    (async () => {
+      await placeBetsForTiles(autoCfg.tiles, autoCfg.amount);
+      setAutoCfg((cur) => {
+        if (!cur) return cur;
+        if (cur.autoReload) return cur;
+        const next = { ...cur, roundsLeft: cur.roundsLeft - 1 };
+        if (next.roundsLeft <= 0) return null;
+        return next;
       });
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok || j?.error) {
-        const msg = j?.error || `http_${r.status}`;
-        setBetError(msg);
-        setToast(`❌ ${msg}`);
-        setTimeout(() => setToast(null), 3500);
-      }
-      else {
-        sounds.betPlaced();
-        setToast(`✅ Bet placed on Tile ${selectedTile}!`);
-        setTimeout(() => setToast(null), 3500);
-        setSelectedTile(null);
-        loadMyBets();
-        loadStatus();
-      }
-    } catch (e: any) {
-      const msg = e?.message || "Failed to place bet";
-      setBetError(msg);
-      setToast(`❌ ${msg}`);
-      setTimeout(() => setToast(null), 3500);
-    } finally { setPlacing(false); }
-  };
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoCfg, isOpen, status?.round_id, addr]);
+
+  // clear selection when round changes (so a fresh round starts clean)
+  React.useEffect(() => {
+    setSelectedTilesState(new Set());
+  }, [status?.round_id]);
+
+
 
   // wheel geometry
   const SIZE = 560;
@@ -437,7 +464,27 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 22, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "360px 1fr", gap: 22, alignItems: "start" }}>
+          {/* BET PANEL */}
+          <BetPanel
+            roundId={status?.round_id ?? null}
+            statusLabel={isOpen ? "MINING OPEN" : isLocked ? "VERIFYING" : isCooldown ? "RESOLVING" : "—"}
+            isOpen={isOpen}
+            isLocked={isLocked}
+            isCooldown={isCooldown}
+            selectedTiles={selectedTiles}
+            setSelectedTiles={setSelectedTiles}
+            onPlaceBets={placeBetsForTiles}
+            placing={placing}
+            myBets={myBetsThisRound.map((b) => ({ tile: b.tile, amount: Number(b.amount) }))}
+            walletConnected={!!addr}
+            onConnect={() => openConnectModal?.()}
+            autoActive={!!autoCfg}
+            autoRoundsLeft={autoCfg?.autoReload ? Infinity as any : (autoCfg?.roundsLeft ?? 0)}
+            onStartAuto={(cfg) => { lastAutoBetRoundRef.current = null; setAutoCfg(cfg); }}
+            onStopAuto={() => setAutoCfg(null)}
+          />
+
           {/* WHEEL */}
           <div style={{
             background: "radial-gradient(ellipse at center, #0f0f12 0%, #050507 75%)",
@@ -462,6 +509,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
               winningTile={animationWinner?.winning_tile ?? null}
               animationRoundId={animationWinner?.round_id ?? null}
               myTiles={myTilesThisRound}
+              selectedTiles={selectedTiles}
               onTileClick={onSegmentClick}
               onAnimationComplete={() => {
                 console.log("[Animation] completed", animationWinner);
@@ -472,173 +520,60 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
                 prevRoundRef.current = null;
               }}
             />
-
           </div>
+        </div>
 
-          {/* SIDEBAR */}
-          <aside style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {/* Drand */}
-            <div style={{
-              background: "#fff7ed", border: "3px solid #000", borderRadius: 14,
-              boxShadow: "5px 5px 0 0 #000", padding: 14,
-            }}>
-              <div style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "#6b7280", fontWeight: 800, marginBottom: 6 }}>
-                <Shield size={11} style={{ verticalAlign: "middle", marginRight: 4 }} /> Drand Target
-              </div>
-              <div className="mono" style={{ color: "#0a0a0a", fontWeight: 900, fontSize: 16, marginBottom: 8 }}>
-                #{status?.drand_target_round ?? "—"}
-              </div>
-              {status?.drand_verify_url && (
-                <a href={status.drand_verify_url} target="_blank" rel="noreferrer"
-                  className="verify-btn" style={{ display: "inline-flex", textDecoration: "none" }}>
-                  Verify on Drand
-                </a>
-              )}
+        {/* Below: Drand + Ended Rounds */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 14, marginTop: 18 }}>
+          <div style={{
+            background: "#0a0a0c", border: "1px solid rgba(255,255,255,.08)",
+            borderRadius: 14, padding: 14, color: "#e4e4e7",
+          }}>
+            <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#71717a", fontWeight: 800, marginBottom: 6 }}>
+              <Shield size={11} style={{ verticalAlign: "middle", marginRight: 4 }} /> DRAND TARGET
             </div>
-
-            {/* My bets */}
-            <div style={{
-              background: "#fff", border: "3px solid #000", borderRadius: 14,
-              boxShadow: "5px 5px 0 0 #000", padding: 14,
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: "#0a0a0a", fontWeight: 900, marginBottom: 10 }}>
-                <Wallet2 size={13} /> My Bets · Round
-              </div>
-              {!addr && <div style={{ fontSize: 12, color: "#6b7280" }}>Connect wallet to bet.</div>}
-              {addr && myBetsThisRound.length === 0 && <div style={{ fontSize: 12, color: "#6b7280" }}>No bets yet this round.</div>}
-              {myBetsThisRound.map((b) => (
-                <div key={b.tile} style={{
-                  display: "flex", justifyContent: "space-between", alignItems: "center",
-                  padding: "8px 10px", background: "#eff6ff", border: "2px solid #000",
-                  borderRadius: 8, marginBottom: 6, fontFamily: "'JetBrains Mono',monospace",
-                  fontWeight: 800, fontSize: 13,
+            <div style={{ fontFamily: "ui-monospace,monospace", fontWeight: 900, fontSize: 18, color: "#fff", marginBottom: 10 }}>
+              #{status?.drand_target_round ?? "—"}
+            </div>
+            {status?.drand_verify_url && (
+              <a href={status.drand_verify_url} target="_blank" rel="noreferrer"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 4,
+                  background: "transparent", color: "#fb923c", textDecoration: "none",
+                  border: "1px solid rgba(249,115,22,.5)", borderRadius: 8,
+                  padding: "6px 10px", fontSize: 11, fontWeight: 800,
                 }}>
-                  <span style={{ color: "#3b82f6" }}>Tile #{b.tile}</span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#0a0a0a" }}>
-                    <CoinImg size={12} /> {Number(b.amount).toFixed(3)}
-                  </span>
-                </div>
-              ))}
+                Verify on Drand <ExternalLink size={11} />
+              </a>
+            )}
+          </div>
+          <div style={{
+            background: "#0a0a0c", border: "1px solid rgba(255,255,255,.08)",
+            borderRadius: 14, padding: 14, color: "#e4e4e7",
+          }}>
+            <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#71717a", fontWeight: 800, marginBottom: 8 }}>
+              <History size={11} style={{ verticalAlign: "middle", marginRight: 4 }} /> ENDED ROUNDS
             </div>
-
-            {/* Ended Rounds */}
-            <div style={{
-              background: "#fff", border: "3px solid #000", borderRadius: 14,
-              boxShadow: "5px 5px 0 0 #000", padding: 14,
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: "#0a0a0a", fontWeight: 900, marginBottom: 10 }}>
-                <History size={13} /> Ended Rounds
-              </div>
-              {history.length === 0 && <div style={{ fontSize: 12, color: "#6b7280" }}>No settled rounds yet.</div>}
+            {history.length === 0 && <div style={{ fontSize: 12, color: "#52525b" }}>No settled rounds yet.</div>}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {history.map((r) => (
-                <div key={r.round_id} style={{
-                  display: "flex", justifyContent: "space-between", alignItems: "center",
-                  background: "#fafafa", border: "2px solid #000", borderRadius: 8,
-                  padding: "8px 10px", marginBottom: 6, gap: 8,
-                }}>
-                  <span className="mono" style={{ color: "#0a0a0a", fontWeight: 900, fontSize: 12 }}>
-                    #{r.round_id}
-                  </span>
-                  <span style={{
-                    background: "#22c55e", color: "#04130a", border: "2px solid #000",
-                    borderRadius: 7, padding: "3px 9px", fontFamily: "'JetBrains Mono',monospace",
-                    fontWeight: 900, fontSize: 12,
+                <button key={r.round_id} onClick={() => openVerify(r.round_id)}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    background: "rgba(34,197,94,.1)", color: "#86efac",
+                    border: "1px solid rgba(34,197,94,.35)", borderRadius: 8,
+                    padding: "6px 10px", fontFamily: "ui-monospace,monospace",
+                    fontWeight: 800, fontSize: 11, cursor: "pointer",
                   }}>
-                    Tile {r.winning_tile}
-                  </span>
-                  <button onClick={() => openVerify(r.round_id)}
-                    className="verify-btn" style={{ fontSize: 11, padding: "5px 10px", cursor: "pointer" }}>
-                    Verify
-                  </button>
-                </div>
+                  #{r.round_id} · Tile {r.winning_tile}
+                </button>
               ))}
             </div>
-          </aside>
+          </div>
         </div>
       </div>
 
-      {/* BET MODAL */}
-      {selectedTile != null && (
-        <div className="modal-bg" onClick={() => !placing && setSelectedTile(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{
-            background: "#fff", color: "#0a0a0a", border: "4px solid #000",
-            boxShadow: "8px 8px 0 0 #000", maxWidth: 420,
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <h3 style={{ color: "#0a0a0a", fontWeight: 900 }}>Tile #{selectedTile}</h3>
-              <button onClick={() => !placing && setSelectedTile(null)}
-                style={{ background: "transparent", border: 0, cursor: "pointer", color: "#0a0a0a" }}>
-                <X size={20} />
-              </button>
-            </div>
-            <div style={{ color: "#374151", fontSize: 13, marginBottom: 14 }}>
-              Enter the amount in zkLTC you want to bet on this tile.
-            </div>
 
-            <label style={{ color: "#374151" }}>Amount (zkLTC)</label>
-            <input
-              type="text"
-              inputMode="decimal"
-              value={amount}
-              onChange={(e) => { setAmount(e.target.value.replace(/[^\d.]/g, "")); setBetError(null); }}
-              disabled={placing || isLocked}
-              style={{
-                background: "#fafafa", color: "#0a0a0a",
-                border: "3px solid #000", borderRadius: 10,
-                padding: "12px 14px", fontFamily: "'JetBrains Mono',monospace",
-                fontWeight: 900, fontSize: 18,
-              }}
-            />
-
-            <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-              {["0.01", "0.05", "0.1", "0.5"].map((v) => (
-                <button key={v}
-                  onClick={() => setAmount(v)}
-                  style={{
-                    background: "#fff7ed", color: "#0a0a0a",
-                    border: "2px solid #000", borderRadius: 8, padding: "6px 12px",
-                    fontFamily: "'JetBrains Mono',monospace", fontWeight: 800, fontSize: 12,
-                    boxShadow: "2px 2px 0 0 #000", cursor: "pointer",
-                  }}>{v}</button>
-              ))}
-            </div>
-
-            {betError && (
-              <div style={{
-                marginTop: 12, padding: "10px 12px", borderRadius: 8,
-                background: "#fee2e2", border: "2px solid #ef4444",
-                color: "#991b1b", fontWeight: 700, fontSize: 13,
-              }}>{betError}</div>
-            )}
-
-            {isLocked && (
-              <div style={{
-                marginTop: 12, padding: "10px 12px", borderRadius: 8,
-                background: "#fee2e2", border: "2px solid #ef4444",
-                color: "#991b1b", fontWeight: 800, fontSize: 13,
-                display: "inline-flex", alignItems: "center", gap: 6,
-              }}><Lock size={14} /> Round is locked</div>
-            )}
-
-            <button
-              onClick={placeBet}
-              disabled={placing || isLocked || myTilesThisRound.has(selectedTile)}
-              style={{
-                width: "100%", marginTop: 16,
-                background: "#22c55e", color: "#04130a",
-                border: "3px solid #000", borderRadius: 12,
-                padding: "14px", fontFamily: "'Space Grotesk',system-ui,sans-serif",
-                fontWeight: 900, fontSize: 15, letterSpacing: ".04em",
-                textTransform: "uppercase", cursor: "pointer",
-                boxShadow: "5px 5px 0 0 #000",
-                opacity: (placing || isLocked || myTilesThisRound.has(selectedTile)) ? 0.5 : 1,
-              }}
-            >
-              {placing ? "Placing…" : "Place Bet"}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* VERIFY MODAL */}
       {verifyModal && (

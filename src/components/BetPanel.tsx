@@ -1,0 +1,329 @@
+import React from "react";
+import Coin from "./Coin";
+
+const TILES = 30;
+
+type Mode = "manual" | "auto";
+
+export type AutoConfig = {
+  tiles: number[];
+  amount: number;
+  roundsLeft: number;
+  autoReload: boolean;
+};
+
+export default function BetPanel({
+  roundId,
+  statusLabel,
+  isOpen,
+  isLocked,
+  isCooldown,
+  selectedTiles,
+  setSelectedTiles,
+  onPlaceBets,
+  placing,
+  myBets,
+  walletConnected,
+  onConnect,
+  autoActive,
+  autoRoundsLeft,
+  onStartAuto,
+  onStopAuto,
+}: {
+  roundId: number | null;
+  statusLabel: string;
+  isOpen: boolean;
+  isLocked: boolean;
+  isCooldown: boolean;
+  selectedTiles: Set<number>;
+  setSelectedTiles: (s: Set<number>) => void;
+  onPlaceBets: (tiles: number[], amount: number) => Promise<void>;
+  placing: boolean;
+  myBets: Array<{ tile: number; amount: number }>;
+  walletConnected: boolean;
+  onConnect: () => void;
+  autoActive: boolean;
+  autoRoundsLeft: number;
+  onStartAuto: (cfg: AutoConfig) => void;
+  onStopAuto: () => void;
+}) {
+  const [mode, setMode] = React.useState<Mode>("manual");
+  const [amount, setAmount] = React.useState("0.01");
+  const [rounds, setRounds] = React.useState("1");
+  const [autoReload, setAutoReload] = React.useState(false);
+
+  const count = selectedTiles.size;
+  const amt = Number(amount) || 0;
+  const roundsNum = Math.max(1, Math.min(20, Number(rounds) || 1));
+  const total = amt * count;
+  const totalAll = total * roundsNum;
+  const lockedUI = isLocked || isCooldown;
+
+  const setAll = (tiles: number[]) => setSelectedTiles(new Set(tiles));
+  const allTiles = Array.from({ length: TILES }, (_, i) => i + 1);
+  const setEven = () => setAll(allTiles.filter((n) => n % 2 === 0));
+  const setOdd = () => setAll(allTiles.filter((n) => n % 2 === 1));
+  const setAllSel = () => setAll(allTiles);
+  const clearSel = () => setAll([]);
+  const bumpAmt = (delta: number) => {
+    const next = Math.max(0, +(amt + delta).toFixed(4));
+    setAmount(String(next));
+  };
+
+  const canPlace = walletConnected && count > 0 && amt > 0 && !lockedUI && !placing;
+  const placeBets = async () => {
+    if (!canPlace) return;
+    await onPlaceBets(Array.from(selectedTiles), amt);
+  };
+
+  const startAuto = () => {
+    if (!walletConnected) { onConnect(); return; }
+    if (count === 0 || amt <= 0) return;
+    onStartAuto({
+      tiles: Array.from(selectedTiles),
+      amount: amt,
+      roundsLeft: roundsNum,
+      autoReload,
+    });
+  };
+
+  // Shared UI
+  const QuickBtn = ({ label, onClick, active }: { label: string; onClick: () => void; active?: boolean }) => (
+    <button
+      onClick={onClick}
+      style={{
+        background: active ? "#27272a" : "transparent",
+        color: "#e4e4e7",
+        border: "1px solid rgba(255,255,255,.18)",
+        borderRadius: 6,
+        padding: "6px 12px",
+        fontFamily: "ui-monospace,monospace",
+        fontSize: 12,
+        fontWeight: 700,
+        cursor: "pointer",
+      }}
+    >{label}</button>
+  );
+
+  return (
+    <div
+      style={{
+        background: "#0a0a0c",
+        border: "1px solid rgba(255,255,255,.08)",
+        borderRadius: 16,
+        padding: 18,
+        color: "#e4e4e7",
+        display: "flex",
+        flexDirection: "column",
+        gap: 14,
+      }}
+    >
+      {/* HEADER */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+        <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#a1a1aa", fontWeight: 800 }}>
+          ROUND #{roundId ?? "—"} · <span style={{ color: "#fb923c" }}>{statusLabel}</span>
+        </div>
+        {autoActive && (
+          <div style={{
+            fontSize: 9, padding: "3px 8px", borderRadius: 999,
+            background: "rgba(249,115,22,.15)", color: "#fb923c",
+            border: "1px solid rgba(249,115,22,.45)", fontWeight: 800, letterSpacing: ".12em",
+          }}>AUTO · {autoRoundsLeft} LEFT</div>
+        )}
+      </div>
+
+      {/* TABS */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
+        {(["manual", "auto"] as Mode[]).map((m) => (
+          <button
+            key={m}
+            onClick={() => setMode(m)}
+            style={{
+              background: "transparent", border: 0, cursor: "pointer",
+              padding: "10px 0",
+              color: mode === m ? "#fb923c" : "#71717a",
+              fontWeight: 800, letterSpacing: ".24em", fontSize: 12,
+              borderBottom: mode === m ? "2px solid #fb923c" : "2px solid transparent",
+              textTransform: "uppercase",
+            }}
+          >{m}</button>
+        ))}
+      </div>
+
+      {/* TILES SELECTION */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+        <div style={{ fontSize: 11, letterSpacing: ".14em", color: "#a1a1aa", fontWeight: 700 }}>
+          {mode === "auto" ? "BLOCKS" : "TILES"} <b style={{ color: "#fff" }}>{count}</b> selected
+        </div>
+        <div style={{ display: "flex", gap: 6 }}>
+          <QuickBtn label="Even" onClick={setEven} />
+          <QuickBtn label="Odd" onClick={setOdd} />
+          <QuickBtn label="All" onClick={setAllSel} />
+          <button onClick={clearSel} title="Clear" style={{
+            background: "transparent", border: "1px solid rgba(255,255,255,.18)",
+            color: "#a1a1aa", borderRadius: 6, padding: "6px 10px", cursor: "pointer", fontWeight: 700,
+          }}>×</button>
+        </div>
+      </div>
+
+      {/* AMOUNT */}
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+          <div style={{ fontSize: 11, letterSpacing: ".14em", color: "#a1a1aa", fontWeight: 700 }}>
+            {mode === "auto" ? "zkLTC" : "AMOUNT"} <span style={{ color: "#52525b" }}>· MIN 0.01</span>
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            <QuickBtn label="+0.01" onClick={() => bumpAmt(0.01)} />
+            <QuickBtn label="+0.1" onClick={() => bumpAmt(0.1)} />
+            <QuickBtn label="+1" onClick={() => bumpAmt(1)} />
+            <button onClick={() => setAmount("0")} style={{
+              background: "transparent", border: "1px solid rgba(255,255,255,.18)",
+              color: "#a1a1aa", borderRadius: 6, padding: "6px 10px", cursor: "pointer", fontWeight: 700,
+            }}>×</button>
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Coin size={28} />
+          <input
+            type="text"
+            inputMode="decimal"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))}
+            style={{
+              background: "transparent", border: 0, outline: 0,
+              color: "#fff", fontWeight: 800, fontSize: 28,
+              fontFamily: "ui-monospace,monospace",
+              width: "100%",
+            }}
+            placeholder="0.0"
+          />
+        </div>
+      </div>
+
+      {/* AUTO-only fields */}
+      {mode === "auto" && (
+        <>
+          <div style={{
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            paddingTop: 10, borderTop: "1px solid rgba(255,255,255,.06)",
+          }}>
+            <div style={{ fontWeight: 800, fontSize: 13 }}>Rounds</div>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={rounds}
+              onChange={(e) => setRounds(e.target.value.replace(/[^\d]/g, ""))}
+              style={{
+                background: "transparent", border: 0, outline: 0,
+                color: "#fff", fontWeight: 800, fontSize: 16, textAlign: "right",
+                width: 60, fontFamily: "ui-monospace,monospace",
+              }}
+            />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ fontWeight: 800, fontSize: 13 }}>Auto-reload</div>
+            <button
+              onClick={() => setAutoReload((v) => !v)}
+              style={{
+                width: 38, height: 22, borderRadius: 999,
+                background: autoReload ? "#fb923c" : "#27272a",
+                border: 0, cursor: "pointer", position: "relative",
+              }}
+            >
+              <span style={{
+                position: "absolute", top: 2, left: autoReload ? 18 : 2,
+                width: 18, height: 18, borderRadius: "50%", background: "#fff",
+                transition: "left 160ms ease",
+              }} />
+            </button>
+          </div>
+          <div style={{ fontSize: 11, color: "#71717a", lineHeight: 1.45, marginTop: -6 }}>
+            Round zkLTC rewards can be added back to this auto budget before the next round.
+          </div>
+          <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 10, display: "flex", flexDirection: "column", gap: 6 }}>
+            <Row label="Total per round" value={total.toFixed(5)} />
+            <Row label="Total" value={totalAll.toFixed(5)} />
+          </div>
+        </>
+      )}
+
+      {/* MY BETS */}
+      <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: 10 }}>
+        <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#71717a", fontWeight: 800, marginBottom: 6 }}>
+          MY BETS THIS ROUND
+        </div>
+        {myBets.length === 0 ? (
+          <div style={{ fontSize: 11, color: "#52525b" }}>No bets yet this round.</div>
+        ) : (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {myBets.map((b) => (
+              <span key={b.tile} style={{
+                fontSize: 11, fontFamily: "ui-monospace,monospace", fontWeight: 800,
+                background: "rgba(34,197,94,.12)", color: "#86efac",
+                border: "1px solid rgba(34,197,94,.4)", borderRadius: 6,
+                padding: "3px 7px",
+              }}>#{b.tile} · {b.amount.toFixed(3)}</span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* BUTTON */}
+      {mode === "manual" ? (
+        <button
+          onClick={walletConnected ? placeBets : onConnect}
+          disabled={walletConnected && !canPlace}
+          style={{
+            width: "100%", marginTop: 4,
+            background: !walletConnected ? "#fb923c" : (canPlace ? "#fb923c" : "rgba(249,115,22,.4)"),
+            color: "#1c1917", border: 0, borderRadius: 10,
+            padding: "14px", fontWeight: 900, fontSize: 14,
+            letterSpacing: ".14em", textTransform: "uppercase",
+            cursor: walletConnected && !canPlace ? "not-allowed" : "pointer",
+          }}
+        >
+          {!walletConnected ? "Connect Wallet" :
+            placing ? "Placing…" :
+            count === 0 ? "Select Tiles" :
+            amt <= 0 ? "Enter zkLTC Amount" :
+            lockedUI ? "Round Locked" :
+            `Place Bet · ${total.toFixed(3)} zkLTC`}
+        </button>
+      ) : (
+        autoActive ? (
+          <button onClick={onStopAuto} style={{
+            width: "100%", background: "#ef4444", color: "#fff",
+            border: 0, borderRadius: 10, padding: "14px",
+            fontWeight: 900, fontSize: 14, letterSpacing: ".14em",
+            textTransform: "uppercase", cursor: "pointer",
+          }}>Stop Auto Betting</button>
+        ) : (
+          <button
+            onClick={startAuto}
+            disabled={walletConnected && (count === 0 || amt <= 0)}
+            style={{
+              width: "100%",
+              background: (count > 0 && amt > 0) || !walletConnected ? "#fb923c" : "rgba(249,115,22,.4)",
+              color: "#1c1917", border: 0, borderRadius: 10,
+              padding: "14px", fontWeight: 900, fontSize: 14,
+              letterSpacing: ".14em", textTransform: "uppercase", cursor: "pointer",
+            }}
+          >
+            {!walletConnected ? "Connect Wallet" : "Start Auto Betting"}
+          </button>
+        )
+      )}
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <span style={{ fontSize: 12, color: "#a1a1aa" }}>{label}</span>
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "ui-monospace,monospace", fontWeight: 800, color: "#fff" }}>
+        <Coin size={14} /> {value}
+      </span>
+    </div>
+  );
+}
