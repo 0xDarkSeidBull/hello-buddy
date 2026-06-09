@@ -12,6 +12,7 @@ type CenterContent = {
   countdown?: boolean;
   timer?: boolean;
 };
+type WheelPhase = "idle" | "resolve" | "scatter" | "logo" | "sweep" | "winner" | "new-round";
 
 export default function PvpWheelVisual({
   size = 560,
@@ -23,11 +24,13 @@ export default function PvpWheelVisual({
   cooldownMs,
   pot,
   winningTile,
+  animationRoundId,
   myTiles,
   tilesWithBets,
   myPayout,
   onTileClick,
   soundOn = true,
+  onAnimationComplete,
 }: {
   size?: number;
   tiles?: number;
@@ -41,21 +44,24 @@ export default function PvpWheelVisual({
   players?: number;
   pot: number;
   winningTile?: number | null;
+  animationRoundId?: number | null;
   myTiles: Set<number>;
   tilesWithBets?: Set<number>;
   myPayout?: number | null;
   onTileClick: (tile: number) => void;
   soundOn?: boolean;
+  onAnimationComplete?: () => void;
 }) {
   // ---- animation state ----
   const [highlighted, setHighlighted] = React.useState<number | null>(null);
-  const [allBlink, setAllBlink] = React.useState(false);
+  const [allBlink] = React.useState(false);
   const [winnerTile, setWinnerTile] = React.useState<number | null>(null);
   const [dimOthers, setDimOthers] = React.useState(false);
   const [shake, setShake] = React.useState(false);
   const [flash, setFlash] = React.useState(false);
   const [center, setCenter] = React.useState<CenterContent>({ line1: "ROUND OPEN", timer: true });
   const [animating, setAnimating] = React.useState(false);
+  const [phase, setPhase] = React.useState<WheelPhase>("idle");
   const [hovered, setHovered] = React.useState<number | null>(null);
   const [tooltipVisible, setTooltipVisible] = React.useState(false);
   const tooltipTimerRef = React.useRef<number | null>(null);
@@ -81,49 +87,57 @@ export default function PvpWheelVisual({
     else if (isCooldown) setCenter({ line1: "RESOLVING", timer: true });
   }, [isOpen, isLocked, isCooldown, animating]);
 
-  // ---- trigger animation when cooldown starts and we know the winning tile ----
+  // ---- trigger animation as soon as parent finds resolved winner ----
   React.useEffect(() => {
-    if (!isCooldown || winningTile == null || roundId == null) return;
-    if (animRanForRoundRef.current === roundId) return;
-    animRanForRoundRef.current = roundId;
+    const animationKey = animationRoundId ?? (isCooldown ? roundId : null);
+    if (winningTile == null || animationKey == null) return;
+    if (animRanForRoundRef.current === animationKey) return;
+    animRanForRoundRef.current = animationKey;
     let cancelled = false;
 
     const run = async () => {
       setAnimating(true);
+      setPhase("resolve");
       setWinnerTile(null);
       setDimOthers(false);
       setShake(false);
+      setCenter({ line1: `ROUND #${animationKey}`, line2: "00:00", line3: "RESOLVING" });
 
-      // PHASE A — sequential highlight 1..30 (1.5s)
-      for (let i = 1; i <= 30; i++) {
+      // PHASE A — gold chase while the round ends
+      for (let step = 0; step < 42; step++) {
         if (cancelled) return;
-        setHighlighted(i);
-        play(() => sounds.tick(200 + i * 15));
-        await sleep(50);
-      }
-      await sleep(200);
-
-      // PHASE B — blink x3 (0.9s)
-      for (let b = 0; b < 3; b++) {
-        if (cancelled) return;
-        setAllBlink(true); await sleep(150);
-        setAllBlink(false); await sleep(150);
+        setHighlighted((step % TILE_COUNT) + 1);
+        play(() => sounds.tick(260 + (step % 8) * 45));
+        await sleep(Math.max(26, 72 - step));
       }
 
-      // PHASE C — fast rotation 3 loops (1.5s)
+      if (cancelled) return;
+      setPhase("scatter");
+      setHighlighted(null);
+      setCenter({ line1: "", line2: "", line3: "" });
+      await sleep(850);
+
+      if (cancelled) return;
+      setPhase("logo");
+      await sleep(950);
+
+      if (cancelled) return;
+      setPhase("sweep");
+      setCenter({ line1: `ROUND #${animationKey}`, line2: "- - -", line3: "STARTS IN A FEW SEC" });
+
+      // PHASE C — ring rebuild + fast sweep
       let current = 1;
-      for (let t = 0; t < 90; t++) {
+      for (let t = 0; t < 75; t++) {
         if (cancelled) return;
         setHighlighted(current);
         if (t % 2 === 0) play(() => sounds.tick(600));
-        await sleep(17);
+        await sleep(20);
         current = (current % 30) + 1;
       }
 
       // PHASE D — slowdown to winning tile
-      const speeds = [17, 17, 25, 35, 50, 70, 100, 150, 200, 280, 350, 420];
+      const speeds = [24, 30, 38, 50, 68, 92, 125, 165, 215, 280, 360, 460];
       let speedIdx = 0;
-      // step until we reach winningTile after at least one full extra loop has begun
       let safety = 0;
       while (safety++ < 200) {
         if (cancelled) return;
@@ -138,6 +152,7 @@ export default function PvpWheelVisual({
 
       // PHASE E — land on winner
       if (cancelled) return;
+      setPhase("winner");
       setWinnerTile(winningTile);
       setHighlighted(null);
       setDimOthers(true);
@@ -145,15 +160,18 @@ export default function PvpWheelVisual({
       play(() => sounds.winner());
       const youWon = myTiles.has(winningTile);
       setCenter({
-        line1: `🏆 TILE ${winningTile} WINS!`,
+        line1: `TILE ${winningTile} WINS`,
         line2: `Pool: ${pot.toFixed(3)} zkLTC`,
         line3: youWon ? `YOU WON! +${(myPayout ?? pot).toFixed(3)} zkLTC` : "",
       });
       setTimeout(() => setShake(false), 600);
-      await sleep(3000);
+      await sleep(2600);
 
-      // PHASE F — countdown 5..1
-      for (let c = 5; c >= 1; c--) {
+      // PHASE F — new round loader
+      setPhase("new-round");
+      setDimOthers(false);
+      setWinnerTile(null);
+      for (let c = 3; c >= 1; c--) {
         if (cancelled) return;
         setCenter({ line1: "NEW ROUND IN", line2: String(c), countdown: true });
         play(() => sounds.tick(400 + (6 - c) * 40));
@@ -168,14 +186,16 @@ export default function PvpWheelVisual({
       setHighlighted(null);
       setWinnerTile(null);
       setDimOthers(false);
+      setPhase("idle");
       setCenter({ line1: "ROUND OPEN", timer: true });
       setAnimating(false);
+      onAnimationComplete?.();
     };
 
     run();
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isCooldown, winningTile, roundId]);
+  }, [animationRoundId, winningTile]);
 
   // ---- tooltip hover delay ----
   const onTileEnter = (tile: number) => {
@@ -199,15 +219,16 @@ export default function PvpWheelVisual({
     const isWin = winnerTile === tileLabel;
     const blink = allBlink;
     const dim = dimOthers && !isWin;
+    const phaseGlow = phase === "sweep" || phase === "new-round";
 
     if (isWin) {
       return {
-        fill: "rgba(251,191,36,0.55)",
-        stroke: "rgba(251,191,36,1)",
+        fill: "rgba(34,197,94,0.55)",
+        stroke: "rgba(52,211,153,1)",
         strokeWidth: 3,
-        glow: "drop-shadow(0 0 30px rgba(251,191,36,0.95))",
+        glow: "drop-shadow(0 0 30px rgba(52,211,153,0.95))",
         opacity: 1,
-        transform: "scale(1.08)",
+        transform: "scale(1.09)",
       };
     }
     if (dim) {
@@ -217,7 +238,14 @@ export default function PvpWheelVisual({
       return { fill: "rgba(249,115,22,0.45)", stroke: "rgba(249,115,22,1)", strokeWidth: 2, glow: "drop-shadow(0 0 16px rgba(249,115,22,0.7))", opacity: 1, transform: "none" };
     }
     if (isHi) {
-      return { fill: "rgba(249,115,22,0.4)", stroke: "rgba(249,115,22,1)", strokeWidth: 2.4, glow: "drop-shadow(0 0 20px rgba(249,115,22,0.7))", opacity: 1, transform: "none" };
+      return {
+        fill: phase === "sweep" ? "rgba(168,85,247,0.42)" : "rgba(249,115,22,0.4)",
+        stroke: phase === "sweep" ? "rgba(217,70,239,1)" : "rgba(249,115,22,1)",
+        strokeWidth: 2.4,
+        glow: phase === "sweep" ? "drop-shadow(0 0 22px rgba(168,85,247,0.85))" : "drop-shadow(0 0 20px rgba(249,115,22,0.7))",
+        opacity: 1,
+        transform: "none"
+      };
     }
     if (isMine) {
       return { fill: "rgba(34,197,94,0.18)", stroke: "rgba(34,197,94,0.9)", strokeWidth: 2, glow: "drop-shadow(0 0 12px rgba(34,197,94,0.4))", opacity: 1, transform: "none" };
@@ -228,7 +256,7 @@ export default function PvpWheelVisual({
     if (hovered === tileLabel && isOpen && !animating) {
       return { fill: "rgba(255,255,255,0.08)", stroke: "rgba(255,255,255,0.5)", strokeWidth: 1.6, glow: "drop-shadow(0 0 10px rgba(255,255,255,0.2))", opacity: 1, transform: "none" };
     }
-    return { fill: "rgba(255,255,255,0.02)", stroke: "rgba(255,255,255,0.16)", strokeWidth: 1.1, glow: "", opacity: 0.7, transform: "none" };
+    return { fill: phaseGlow ? "rgba(245,158,11,0.12)" : "rgba(255,255,255,0.02)", stroke: phaseGlow ? "rgba(245,158,11,0.55)" : "rgba(255,255,255,0.16)", strokeWidth: 1.1, glow: "", opacity: 0.7, transform: "none" };
   };
 
   const fmtClock = (ms: number) => {
@@ -275,15 +303,23 @@ export default function PvpWheelVisual({
             const tileLabel = tile.id + 1;
             const isMine = myTiles.has(tileLabel);
             const interactive = isOpen && !animating;
+            const scatterActive = phase === "scatter" || phase === "logo";
+            const scatterRad = (tile.middleDegrees - 90) * Math.PI / 180;
+            const scatterDistance = phase === "logo" ? 128 : 58;
+            const scatterTransform = scatterActive
+              ? `translate(${Math.cos(scatterRad) * scatterDistance}px, ${Math.sin(scatterRad) * scatterDistance}px) rotate(${tile.middleDegrees * 0.12}deg) scale(${phase === "logo" ? 0.94 : 1})`
+              : s.transform;
+            const phaseOpacity = phase === "logo" && tileLabel > 12 && tileLabel < 23 ? 0.08 : s.opacity;
             return (
               <g
                 key={tile.id}
                 style={{
                   cursor: interactive ? "pointer" : "default",
                   filter: s.glow,
-                  transition: "filter 180ms ease, transform 220ms ease",
-                  transform: s.transform,
-                  transformOrigin: `${tile.labelX}px ${tile.labelY}px`,
+                  transition: "filter 180ms ease, transform 700ms cubic-bezier(.2,.9,.2,1), opacity 450ms ease",
+                  transform: scatterTransform,
+                  transformOrigin: "290px 290px",
+                  opacity: phaseOpacity,
                 }}
                 onPointerEnter={() => onTileEnter(tileLabel)}
                 onPointerLeave={onTileLeave}
@@ -319,6 +355,14 @@ export default function PvpWheelVisual({
             );
           })}
         </svg>
+
+        {phase === "logo" && (
+          <div className="pvp-sol-loader" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+        )}
 
         {/* HOVER TOOLTIP */}
         {tooltipVisible && tooltipTile != null && tooltipPos && (
@@ -364,6 +408,9 @@ export default function PvpWheelVisual({
             padding: 14,
             zIndex: 20,
             overflow: "hidden",
+            opacity: phase === "logo" ? 0 : 1,
+            transform: phase === "winner" ? "scale(1.04)" : "scale(1)",
+            transition: "opacity 240ms ease, transform 240ms ease",
           }}
         >
           <span style={{
@@ -428,6 +475,29 @@ export default function PvpWheelVisual({
           80% { transform: translate(4px, -3px); }
         }
         @keyframes pvpFlash { 0% { opacity: 0.9; } 100% { opacity: 0; } }
+        .pvp-sol-loader {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 9px;
+          z-index: 24;
+          pointer-events: none;
+          animation: pvpLogoIn 900ms ease both;
+        }
+        .pvp-sol-loader span {
+          width: 72px;
+          height: 16px;
+          border-radius: 3px;
+          transform: skewX(-22deg);
+          background: linear-gradient(90deg, #7c3aed, #22d3ee, #34d399);
+          box-shadow: 0 0 26px rgba(168,85,247,.75);
+        }
+        .pvp-sol-loader span:nth-child(2) { background: linear-gradient(90deg, #22d3ee, #34d399); transform: skewX(-22deg) translateX(-8px); }
+        .pvp-sol-loader span:nth-child(3) { background: linear-gradient(90deg, #a855f7, #7c3aed); transform: skewX(-22deg) translateX(8px); }
+        @keyframes pvpLogoIn { from { opacity: 0; transform: scale(.86); } 35% { opacity: 1; } to { opacity: 1; transform: scale(1); } }
       `}</style>
     </div>
   );
