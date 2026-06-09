@@ -21,14 +21,9 @@ const EXPLORER_TX = "https://liteforge.explorer.caldera.xyz/tx";
 const MIN_BET = 0.001;
 
 const BET_ABI = [
-  {
-    inputs: [{ internalType: "uint8", name: "tile", type: "uint8" }],
-    name: "placeBet",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-] as const;
+  "function placeBet(uint8 tile) external payable",
+  "function getCurrentRound() external view returns (uint256 id, bool resolved, uint8 winningTile, uint256 totalPool)"
+];
 
 async function ensureLiteForge() {
   const eth = (window as any).ethereum;
