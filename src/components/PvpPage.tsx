@@ -740,7 +740,19 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           fontWeight: 900, fontSize: 14, letterSpacing: ".04em",
           zIndex: 1000,
           animation: "fade-in .3s ease-out",
-        }}>{toast}</div>
+        }}>
+          <span>{toast}</span>
+          {lastTxHash && (
+            <a
+              href={`${EXPLORER_TX}/${lastTxHash}`}
+              target="_blank"
+              rel="noreferrer"
+              style={{ marginLeft: 12, color: "#7c5cff", textDecoration: "underline", display: "inline-flex", alignItems: "center", gap: 4 }}
+            >
+              View TX <ExternalLink size={12} />
+            </a>
+          )}
+        </div>
       )}
     </div>
   );
