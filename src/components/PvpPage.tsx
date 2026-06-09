@@ -471,7 +471,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           {/* BET PANEL */}
           <BetPanel
             roundId={status?.round_id ?? null}
-            statusLabel={isOpen ? "MINING OPEN" : isLocked ? "VERIFYING" : isCooldown ? "RESOLVING" : "—"}
+            statusLabel={isOpen ? "Mining Open" : isLocked ? "Verifying" : isCooldown ? "Resolving" : "—"}
             isOpen={isOpen}
             isLocked={isLocked}
             isCooldown={isCooldown}
@@ -498,9 +498,9 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
               alignSelf: "center", minWidth: 360, maxWidth: 520, width: "100%",
             }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                <div style={{ fontSize: 10, letterSpacing: ".18em", color: "#475569", fontWeight: 800 }}>
-                  <Shield size={11} style={{ verticalAlign: "middle", marginRight: 4, color: "#7c5cff" }} />
-                  DRAND · <span style={{ color: "#7c5cff" }}>TARGET</span> · #{status?.drand_target_round ?? "—"}
+                <div className="side-head" style={{ fontSize: 13, marginBottom: 0 }}>
+                  <Shield size={14} style={{ verticalAlign: "middle", marginRight: 6, color: "#7c5cff" }} />
+                  Drand · <span style={{ color: "#7c5cff" }}>Target</span> · #{status?.drand_target_round ?? "—"}
                 </div>
               </div>
               {status?.drand_verify_url && (
@@ -560,11 +560,11 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
               <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
                 <History size={15} /> Ended Rounds
               </span>
-              <span style={{
-                fontSize: 10, padding: "3px 8px", borderRadius: 999,
+              <span className="side-head" style={{
+                fontSize: 12, padding: "3px 10px", borderRadius: 999,
                 background: "rgba(124,92,255,.12)", color: "#7c5cff",
-                border: "1px solid rgba(124,92,255,.4)", fontWeight: 800, letterSpacing: ".12em",
-              }}>{history.length} TOTAL</span>
+                border: "1px solid rgba(124,92,255,.4)", marginBottom: 0,
+              }}>{history.length} Total</span>
             </div>
             <div style={{ borderTop: "1px solid rgba(15,23,42,.10)", paddingTop: 10, maxHeight: 560, overflowY: "auto" }}>
               {history.length === 0 ? (
