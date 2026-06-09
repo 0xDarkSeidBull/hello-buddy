@@ -422,6 +422,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
 
   // clear selection when round changes (so a fresh round starts clean)
   React.useEffect(() => {
+    selectedTilesRef.current = new Set();
     setSelectedTilesState(new Set());
   }, [status?.round_id]);
 
