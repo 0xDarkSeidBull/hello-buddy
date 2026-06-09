@@ -65,6 +65,7 @@ type MyBet = { round_id: number; tile: number; amount: number };
 type EndedRound = {
   round_id: number;
   winning_tile: number;
+  total_pool?: number;
   status?: string;
   drand_verify_url?: string;
   drand_round?: number | string;
@@ -99,6 +100,7 @@ function normalizeEndedRound(raw: any): EndedRound | null {
   return {
     round_id: roundId,
     winning_tile: winningTile,
+    total_pool: Number.isFinite(Number(raw?.total_pool)) ? Number(raw?.total_pool) : 0,
     status,
     drand_verify_url: raw?.drand_verify_url,
     drand_round: raw?.drand_target_round ?? raw?.drand_round,
@@ -611,7 +613,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
                 isCooldown={isCooldown}
                 cooldownMs={cooldownMsLeft || cooldownSeconds * 1000}
                 players={myBets.filter((b) => b.round_id === status?.round_id).length}
-                pot={status?.total_pool ?? 0}
+                pot={animationWinner?.total_pool ?? status?.total_pool ?? 0}
                 winningTile={animationWinner?.winning_tile ?? null}
                 animationRoundId={animationWinner?.round_id ?? null}
                 myTiles={myTilesThisRound}
