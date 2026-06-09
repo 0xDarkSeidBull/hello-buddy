@@ -62,6 +62,7 @@ type Status = {
 };
 
 type MyBet = { round_id: number; tile: number; amount: number };
+type Payout = { wallet?: string; bet?: number; payout?: number };
 type EndedRound = {
   round_id: number;
   winning_tile: number;
@@ -69,6 +70,7 @@ type EndedRound = {
   status?: string;
   drand_verify_url?: string;
   drand_round?: number | string;
+  payouts?: Payout[];
 };
 
 type RoundDetails = {
