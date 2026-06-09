@@ -77,10 +77,11 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
   const [statusFetchedAt, setStatusFetchedAt] = React.useState<number>(Date.now());
   const [history, setHistory] = React.useState<EndedRound[]>([]);
   const [myBets, setMyBets] = React.useState<MyBet[]>([]);
-  const [selectedTile, setSelectedTile] = React.useState<number | null>(null);
-  const [amount, setAmount] = React.useState("0.01");
+  const [selectedTiles, setSelectedTilesState] = React.useState<Set<number>>(new Set());
   const [placing, setPlacing] = React.useState(false);
-  const [betError, setBetError] = React.useState<string | null>(null);
+  const [autoCfg, setAutoCfg] = React.useState<AutoConfig | null>(null);
+  const lastAutoBetRoundRef = React.useRef<number | null>(null);
+
   const [verifyModal, setVerifyModal] = React.useState<{ loading: boolean; data: RoundDetails | null; error?: string; round_id: number } | null>(null);
   const [, setNow] = React.useState(Date.now());
   const [lastResolvedRound, setLastResolvedRound] = React.useState<EndedRound | null>(null);
