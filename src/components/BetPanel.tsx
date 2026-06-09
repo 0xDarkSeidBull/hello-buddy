@@ -274,14 +274,13 @@ export default function BetPanel({
       {/* BUTTON */}
       {mode === "manual" ? (
         <button
+          className="verify-btn"
           onClick={walletConnected ? placeBets : onConnect}
           disabled={walletConnected && !canPlace}
           style={{
-            width: "100%", marginTop: 4,
-            background: !walletConnected ? "#7c5cff" : (canPlace ? "#7c5cff" : "rgba(124,92,255,.4)"),
-            color: "#fff", border: 0, borderRadius: 10,
-            padding: "14px", fontWeight: 900, fontSize: 14,
-            letterSpacing: ".14em", textTransform: "uppercase",
+            width: "100%", marginTop: 4, padding: "14px",
+            fontSize: 13, letterSpacing: ".14em",
+            opacity: walletConnected && !canPlace ? 0.55 : 1,
             cursor: walletConnected && !canPlace ? "not-allowed" : "pointer",
           }}
         >
