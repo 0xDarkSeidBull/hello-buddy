@@ -143,17 +143,20 @@ export default function PvpWheelVisual({
     animRanForRoundRef.current = animationKey;
     winningTileRef.current = wt;
     animationRunningRef.current = true;
+    isBonanzaRef.current = isBonanza;
     let cancelled = false;
 
     const run = async () => {
       const winningTile = wt; // local stable copy used throughout
-      console.log("[Animation] Starting for round", animationKey, "winning tile:", winningTile);
+      const bonanza = isBonanzaRef.current;
+      console.log("[Animation] Starting for round", animationKey, "winning tile:", winningTile, "bonanza:", bonanza);
       setAnimating(true);
       setPhase("sequence");
       setWinnerTile(null);
       setDimOthers(false);
       setShake(false);
       setBlinkSet(null);
+      setBonanzaActive(bonanza);
       setCenter({ line1: `ROUND #${animationKey}`, line2: "RESOLVING", line3: "SCANNING TILES" });
 
       // PHASE A — click each tile one by one 1..30
@@ -178,6 +181,7 @@ export default function PvpWheelVisual({
         setBlinkSet(null);
         await sleep(45);
       }
+
 
       // PHASE C — even tiles blink
       if (cancelled) return;
