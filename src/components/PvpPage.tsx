@@ -471,7 +471,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           {/* BET PANEL */}
           <BetPanel
             roundId={status?.round_id ?? null}
-            statusLabel={isOpen ? "MINING OPEN" : isLocked ? "VERIFYING" : isCooldown ? "RESOLVING" : "—"}
+            statusLabel={isOpen ? "Mining Open" : isLocked ? "Verifying" : isCooldown ? "Resolving" : "—"}
             isOpen={isOpen}
             isLocked={isLocked}
             isCooldown={isCooldown}
