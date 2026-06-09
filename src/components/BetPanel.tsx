@@ -138,22 +138,19 @@ export default function BetPanel({
         )}
       </div>
 
-      {/* TABS */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderBottom: "1px solid #0f172a" }}>
-        {(["manual", "auto"] as Mode[]).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            style={{
-              background: "transparent", border: 0, cursor: "pointer",
-              padding: "10px 0",
-              color: mode === m ? "#7c5cff" : "#64748b",
-              fontWeight: 800, letterSpacing: ".24em", fontSize: 12,
-              borderBottom: mode === m ? "2px solid #fb923c" : "2px solid transparent",
-              textTransform: "uppercase",
-            }}
-          >{m}</button>
-        ))}
+      {/* TABS — manual only */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", borderBottom: "1px solid #0f172a" }}>
+        <button
+          onClick={() => setMode("manual")}
+          style={{
+            background: "transparent", border: 0, cursor: "default",
+            padding: "10px 0",
+            color: "#7c5cff",
+            fontWeight: 800, letterSpacing: ".24em", fontSize: 12,
+            borderBottom: "2px solid #fb923c",
+            textTransform: "uppercase",
+          }}
+        >manual</button>
       </div>
 
       {/* TILES SELECTION */}
