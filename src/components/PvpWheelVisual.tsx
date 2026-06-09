@@ -456,7 +456,7 @@ export default function PvpWheelVisual({
         >
           <span style={{
             fontSize: 12, fontWeight: 800, textTransform: "uppercase",
-            letterSpacing: "0.24em", color: "#a1a1aa",
+            letterSpacing: "0.24em", color: "#475569",
             fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
             animation: isLocked ? "pvpPulse 1.4s ease-in-out infinite" : undefined,
             marginBottom: 6,
@@ -469,7 +469,7 @@ export default function PvpWheelVisual({
               <span style={{
                 fontSize: 52, fontWeight: 900, lineHeight: 1,
                 fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-                color: (isOpen || timeLeftMs > 0) ? "#fff" : isLocked ? "#fbbf24" : "#fff",
+                color: (isOpen || timeLeftMs > 0) ? "#0f172a" : isLocked ? "#d97706" : "#0f172a",
                 letterSpacing: ".02em",
               }}>{fmtClock(timeLeftMs)}</span>
             ) : (
@@ -477,7 +477,7 @@ export default function PvpWheelVisual({
                 fontSize: center.countdown ? 52 : 26,
                 fontWeight: 900, lineHeight: 1,
                 fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-                color: center.countdown ? "#fbbf24" : "#34d399",
+                color: center.countdown ? "#d97706" : "#059669",
                 animation: center.countdown ? "pvpPulse 1s ease-in-out infinite" : undefined,
               }}>{center.line2}</span>
             )}
@@ -485,7 +485,7 @@ export default function PvpWheelVisual({
 
           {center.line3 && (
             <div style={{
-              fontSize: 13, fontWeight: 800, color: "#34d399",
+              fontSize: 13, fontWeight: 800, color: "#059669",
               fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
               marginTop: 4,
             }}>{center.line3}</div>
@@ -494,12 +494,12 @@ export default function PvpWheelVisual({
           {!center.line3 && (
             <div style={{
               display: "flex", flexDirection: "column", gap: 6, fontSize: 13,
-              color: "#a1a1aa", fontWeight: 700,
+              color: "#64748b", fontWeight: 700,
               fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
               marginTop: 8,
             }}>
               <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                POOL <Coin size={14} /> <b style={{ color: "#fff" }}>{pot.toFixed(3)}</b>
+                POOL <Coin size={14} /> <b style={{ color: "#0f172a" }}>{pot.toFixed(3)}</b>
               </span>
               <span>ROUND <b style={{ color: "#fb923c" }}>#{roundId ?? "—"}</b></span>
               {isCooldown && cdSecs > 0 && !animating && (
