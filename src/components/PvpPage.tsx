@@ -575,17 +575,19 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
               {history.length === 0 ? (
                 <div style={{ fontSize: 11, color: "#64748b" }}>No settled rounds yet.</div>
               ) : (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {history.map((r) => (
-                    <button key={r.round_id} onClick={() => openVerify(r.round_id)}
+                    <div key={r.round_id}
                       style={{
-                        fontSize: 11, fontFamily: "ui-monospace,monospace", fontWeight: 800,
-                        background: "rgba(124,92,255,.12)", color: "#7c5cff",
-                        border: "1px solid rgba(124,92,255,.4)", borderRadius: 6,
-                        padding: "3px 7px", cursor: "pointer",
+                        background: "var(--bg-2)", border: "1px solid var(--line)",
+                        borderRadius: 11, padding: "10px 12px",
+                        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
                       }}>
-                      #{r.round_id} · Tile {r.winning_tile}
-                    </button>
+                      <span className="mono" style={{ color: "#22d3ee", fontWeight: 700, fontSize: 13 }}>
+                        #{r.round_id} · Tile {r.winning_tile}
+                      </span>
+                      <button className="verify-btn" onClick={() => openVerify(r.round_id)}>Verify</button>
+                    </div>
                   ))}
                 </div>
               )}
