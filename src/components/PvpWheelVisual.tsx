@@ -67,6 +67,8 @@ export default function PvpWheelVisual({
   const tooltipTimerRef = React.useRef<number | null>(null);
   const animRanForRoundRef = React.useRef<number | null>(null);
   const lastTickSecRef = React.useRef<number>(-1);
+  const winningTileRef = React.useRef<number | null>(null);
+  const animationRunningRef = React.useRef<boolean>(false);
 
   const play = React.useCallback((fn: () => void) => { if (soundOn) fn(); }, [soundOn]);
 
