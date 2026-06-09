@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { History as HistoryIcon, X, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 
 const HISTORY_URL = "https://lit-api.test-hub.xyz/bets/history";
@@ -133,7 +134,7 @@ export default function MyBetsModal({
         <HistoryIcon size={14} /> My Bets
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
           onClick={() => setOpen(false)}
           style={{
@@ -246,7 +247,8 @@ export default function MyBetsModal({
             )}
           </div>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
