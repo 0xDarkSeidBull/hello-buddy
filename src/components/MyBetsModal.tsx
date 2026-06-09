@@ -139,37 +139,50 @@ export default function MyBetsModal({
           style={{
             position: "fixed", inset: 0, zIndex: 9999,
             background: "rgba(15,23,42,.55)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            padding: 20, backdropFilter: "blur(3px)",
+            display: "flex",
+            alignItems: isMobile ? "flex-end" : "center",
+            justifyContent: "center",
+            padding: isMobile ? 0 : 20,
+            backdropFilter: "blur(3px)",
           }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              width: "min(1180px, 100%)", maxHeight: "92vh",
+              width: isMobile ? "100%" : "min(480px, 100%)",
+              maxHeight: isMobile ? "90vh" : "92vh",
               background: "#f3f4f6",
               backgroundImage:
                 "linear-gradient(rgba(15,23,42,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(15,23,42,.06) 1px,transparent 1px)",
               backgroundSize: "32px 32px",
-              border: "2px solid #0f172a", borderRadius: 18,
+              border: "2px solid #0f172a",
+              borderRadius: isMobile ? "18px 18px 0 0" : 18,
               boxShadow: "6px 6px 0 0 rgba(15,23,42,.9)",
               color: "#0f172a",
               display: "flex", flexDirection: "column", overflow: "hidden",
               fontFamily: "'Space Grotesk',system-ui,sans-serif",
             }}
           >
-            {/* Header with notebook title card */}
+            {/* Sticky header */}
             <div style={{
               position: "relative",
-              padding: "26px 22px 18px",
+              padding: isMobile ? "20px 18px 14px" : "18px 18px 14px",
               display: "flex", alignItems: "center", justifyContent: "center",
               borderBottom: "2px solid #0f172a",
+              background: "#f3f4f6",
+              flexShrink: 0,
             }}>
+              {isMobile && (
+                <div style={{
+                  position: "absolute", top: 7, left: "50%", transform: "translateX(-50%)",
+                  width: 42, height: 4, borderRadius: 999, background: "rgba(15,23,42,.25)",
+                }} />
+              )}
               <div style={{
                 background: "#ffffff", border: "2px solid #0f172a",
-                borderRadius: 14, padding: "12px 32px",
-                boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)",
-                fontWeight: 900, fontSize: 22, letterSpacing: ".10em",
+                borderRadius: 12, padding: "8px 22px",
+                boxShadow: "3px 3px 0 0 rgba(15,23,42,.9)",
+                fontWeight: 900, fontSize: 16, letterSpacing: ".12em",
               }}>
                 MY BETS
               </div>
@@ -177,7 +190,7 @@ export default function MyBetsModal({
                 onClick={() => setOpen(false)}
                 aria-label="Close"
                 style={{
-                  position: "absolute", right: 18, top: 18,
+                  position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
                   background: "#ffffff", border: "2px solid #0f172a",
                   color: "#0f172a", borderRadius: 10, padding: 6, cursor: "pointer",
                   display: "inline-flex", boxShadow: "2px 2px 0 0 rgba(15,23,42,.9)",
