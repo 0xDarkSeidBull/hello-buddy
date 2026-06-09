@@ -1,9 +1,9 @@
 import React from "react";
-import { ArrowLeft, Shield, History, Wallet2, X, Lock, ExternalLink } from "lucide-react";
+import { ArrowLeft, Shield, History, ExternalLink } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import CoinImg from "./Coin";
 import PvpWheelVisual from "./PvpWheelVisual";
+import BetPanel, { AutoConfig } from "./BetPanel";
 import { sounds } from "../lib/pvpSounds";
 
 const API = "https://lit-api.test-hub.xyz";
@@ -11,6 +11,7 @@ const STATUS_URL = `${API}/bets/status`;
 const HISTORY_URL = `${API}/bets/history`;
 const PLACE_URL = `${API}/bets/place`;
 const TILES = 30;
+
 
 type Status = {
   round_id?: number | null;
