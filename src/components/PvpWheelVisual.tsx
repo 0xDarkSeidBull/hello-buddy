@@ -445,11 +445,8 @@ export default function PvpWheelVisual({
         <div
           style={{
             position: "absolute",
-            inset: "33%",
-            borderRadius: "50%",
-            background: "rgba(9,9,11,0.92)",
-            border: "1px solid rgba(63,63,70,0.8)",
-            boxShadow: "inset 0 4px 30px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.7)",
+            inset: "30%",
+            background: "transparent",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -464,25 +461,27 @@ export default function PvpWheelVisual({
           }}
         >
           <span style={{
-            fontSize: "0.58rem", fontWeight: 800, textTransform: "uppercase",
-            letterSpacing: "0.2em", color: "#71717a",
+            fontSize: 12, fontWeight: 800, textTransform: "uppercase",
+            letterSpacing: "0.24em", color: "#a1a1aa",
             fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
             animation: isLocked ? "pvpPulse 1.4s ease-in-out infinite" : undefined,
+            marginBottom: 6,
           }}>
             {center.line1}
           </span>
 
-          <div style={{ margin: "6px 0", minHeight: 36, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ margin: "4px 0", minHeight: 56, display: "flex", alignItems: "center", justifyContent: "center" }}>
             {center.timer ? (
               <span style={{
-                fontSize: 30, fontWeight: 900,
+                fontSize: 52, fontWeight: 900, lineHeight: 1,
                 fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-                color: (isOpen || timeLeftMs > 0) ? "#fb923c" : isLocked ? "#fbbf24" : "#a1a1aa",
+                color: (isOpen || timeLeftMs > 0) ? "#fff" : isLocked ? "#fbbf24" : "#fff",
+                letterSpacing: ".02em",
               }}>{fmtClock(timeLeftMs)}</span>
             ) : (
               <span style={{
-                fontSize: center.countdown ? 44 : 22,
-                fontWeight: 900,
+                fontSize: center.countdown ? 52 : 26,
+                fontWeight: 900, lineHeight: 1,
                 fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
                 color: center.countdown ? "#fbbf24" : "#34d399",
                 animation: center.countdown ? "pvpPulse 1s ease-in-out infinite" : undefined,
@@ -492,27 +491,30 @@ export default function PvpWheelVisual({
 
           {center.line3 && (
             <div style={{
-              fontSize: 11, fontWeight: 800, color: "#34d399",
+              fontSize: 13, fontWeight: 800, color: "#34d399",
               fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-              marginTop: 2,
+              marginTop: 4,
             }}>{center.line3}</div>
           )}
 
           {!center.line3 && (
             <div style={{
-              display: "flex", flexDirection: "column", gap: 2, fontSize: 10,
-              color: "#a1a1aa",
+              display: "flex", flexDirection: "column", gap: 6, fontSize: 13,
+              color: "#a1a1aa", fontWeight: 700,
               fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-              marginTop: 4,
+              marginTop: 8,
             }}>
-              <span>POOL <b style={{ color: "#fff" }}>{pot.toFixed(3)}</b> zkLTC</span>
+              <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                POOL <Coin size={14} /> <b style={{ color: "#fff" }}>{pot.toFixed(3)}</b>
+              </span>
               <span>ROUND <b style={{ color: "#fb923c" }}>#{roundId ?? "—"}</b></span>
               {isCooldown && cdSecs > 0 && !animating && (
-                <span>NEXT IN {cdSecs}s</span>
+                <span style={{ color: "#fb923c", fontWeight: 800 }}>NEXT IN {cdSecs}s</span>
               )}
             </div>
           )}
         </div>
+
       </div>
 
       <style>{`
