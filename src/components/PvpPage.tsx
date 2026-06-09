@@ -514,9 +514,9 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
 
             {/* WHEEL */}
             <div style={{
-              background: "radial-gradient(ellipse at center, #0f0f12 0%, #050507 75%)",
-              border: "1px solid #0f172a", borderRadius: 22,
-              boxShadow: "0 30px 60px -20px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.02)",
+              background: "radial-gradient(ellipse at center, #ffffff 0%, #f1f3f7 75%)",
+              border: "2px solid #0f172a", borderRadius: 22,
+              boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)",
               padding: 24,
               display: "flex", justifyContent: "center", alignItems: "center",
               position: "relative", minHeight: 600,
