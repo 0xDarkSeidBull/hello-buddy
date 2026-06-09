@@ -188,7 +188,11 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
       if (enteringCooldown || roundChanged) {
         const endedRoundId = roundChanged ? prevRound : (apiRoundId ?? prevRound);
         console.log("[Poll] round ended — fetching history for winner", { enteringCooldown, roundChanged, endedRoundId, prevRound, newRound: apiRoundId });
-        runAfterVisibleZero(j.time_left_ms, () => queueAnimationForRound(endedRoundId, enteringCooldown ? "cooldown" : "round-change"));
+        if (roundChanged) {
+          queueAnimationForRound(endedRoundId, "round-change");
+        } else {
+          runAfterVisibleZero(j.time_left_ms, () => queueAnimationForRound(endedRoundId, "cooldown"));
+        }
       }
 
       lastPollStatusRef.current = j.status ?? null;
