@@ -13,7 +13,7 @@ const HISTORY_URL = `${API}/bets/history`;
 const CONFIRM_URL = `${API}/bets/confirm`;
 const TILES = 30;
 
-const CONTRACT_ADDRESS = "0xfC4f072f48d0981BfdEED048356c0Bf80d7799Aa";
+const CONTRACT_ADDRESS = "0x162ED453121f91eb3595e7f4513F78a0b5b02a81";
 const CHAIN_ID = 4441;
 const CHAIN_ID_HEX = "0x1159";
 const RPC_URL = "https://liteforge.rpc.caldera.xyz/http";
@@ -22,6 +22,7 @@ const MIN_BET = 0.001;
 
 const BET_ABI = [
   "function placeBet(uint8 tile) external payable",
+  "function placeBetMulti(uint8[] calldata tiles) external payable",
   "function getCurrentRound() external view returns (uint256 id, bool resolved, uint8 winningTile, uint256 totalPool)"
 ];
 
