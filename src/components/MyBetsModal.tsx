@@ -140,23 +140,24 @@ export default function MyBetsModal({
             position: "fixed", inset: 0, zIndex: 9999,
             background: "rgba(15,23,42,.55)",
             display: "flex",
-            alignItems: isMobile ? "flex-end" : "center",
+            alignItems: "center",
             justifyContent: "center",
-            padding: isMobile ? 0 : 20,
+            padding: isMobile ? "12px" : 20,
             backdropFilter: "blur(3px)",
+            overflowY: "auto",
           }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
               width: isMobile ? "100%" : "min(480px, 100%)",
-              maxHeight: isMobile ? "90vh" : "92vh",
+              maxHeight: isMobile ? "85vh" : "92vh",
               background: "#f3f4f6",
               backgroundImage:
                 "linear-gradient(rgba(15,23,42,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(15,23,42,.06) 1px,transparent 1px)",
               backgroundSize: "32px 32px",
               border: "2px solid #0f172a",
-              borderRadius: isMobile ? "18px 18px 0 0" : 18,
+              borderRadius: 18,
               boxShadow: "6px 6px 0 0 rgba(15,23,42,.9)",
               color: "#0f172a",
               display: "flex", flexDirection: "column", overflow: "hidden",
