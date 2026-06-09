@@ -12,7 +12,7 @@ type CenterContent = {
   countdown?: boolean;
   timer?: boolean;
 };
-type WheelPhase = "idle" | "resolve" | "scatter" | "logo" | "sweep" | "winner" | "new-round";
+type WheelPhase = "idle" | "sequence" | "blink-all" | "blink-even" | "blink-odd" | "sweep" | "winner" | "new-round";
 
 export default function PvpWheelVisual({
   size = 560,
@@ -54,7 +54,7 @@ export default function PvpWheelVisual({
 }) {
   // ---- animation state ----
   const [highlighted, setHighlighted] = React.useState<number | null>(null);
-  const [allBlink] = React.useState(false);
+  const [blinkSet, setBlinkSet] = React.useState<Set<number> | null>(null);
   const [winnerTile, setWinnerTile] = React.useState<number | null>(null);
   const [dimOthers, setDimOthers] = React.useState(false);
   const [shake, setShake] = React.useState(false);
@@ -97,46 +97,75 @@ export default function PvpWheelVisual({
 
     const run = async () => {
       setAnimating(true);
-      setPhase("resolve");
+      setPhase("sequence");
       setWinnerTile(null);
       setDimOthers(false);
       setShake(false);
-      setCenter({ line1: `ROUND #${animationKey}`, line2: "00:00", line3: "RESOLVING" });
+      setBlinkSet(null);
+      setCenter({ line1: `ROUND #${animationKey}`, line2: "RESOLVING", line3: "SCANNING TILES" });
 
-      // PHASE A — gold chase while the round ends
-      for (let step = 0; step < 42; step++) {
+      // PHASE A — click each tile one by one 1..30
+      for (let i = 1; i <= TILE_COUNT; i++) {
         if (cancelled) return;
-        setHighlighted((step % TILE_COUNT) + 1);
-        play(() => sounds.tick(260 + (step % 8) * 45));
-        await sleep(Math.max(26, 72 - step));
+        setHighlighted(i);
+        play(() => sounds.tick(280 + i * 12));
+        await sleep(55);
+      }
+      setHighlighted(null);
+      await sleep(120);
+
+      // PHASE B — all tiles blink together
+      if (cancelled) return;
+      setPhase("blink-all");
+      const all = new Set<number>(Array.from({ length: TILE_COUNT }, (_, i) => i + 1));
+      for (let b = 0; b < 2; b++) {
+        if (cancelled) return;
+        setBlinkSet(all);
+        play(() => sounds.tick(520));
+        await sleep(160);
+        setBlinkSet(null);
+        await sleep(120);
       }
 
+      // PHASE C — even tiles blink
       if (cancelled) return;
-      setPhase("scatter");
-      setHighlighted(null);
-      setCenter({ line1: "", line2: "", line3: "" });
-      await sleep(850);
+      setPhase("blink-even");
+      const evens = new Set<number>(Array.from({ length: TILE_COUNT }, (_, i) => i + 1).filter((n) => n % 2 === 0));
+      for (let b = 0; b < 2; b++) {
+        if (cancelled) return;
+        setBlinkSet(evens);
+        play(() => sounds.tick(620));
+        await sleep(150);
+        setBlinkSet(null);
+        await sleep(110);
+      }
 
+      // PHASE D — odd tiles blink
       if (cancelled) return;
-      setPhase("logo");
-      await sleep(950);
+      setPhase("blink-odd");
+      const odds = new Set<number>(Array.from({ length: TILE_COUNT }, (_, i) => i + 1).filter((n) => n % 2 === 1));
+      for (let b = 0; b < 2; b++) {
+        if (cancelled) return;
+        setBlinkSet(odds);
+        play(() => sounds.tick(720));
+        await sleep(150);
+        setBlinkSet(null);
+        await sleep(110);
+      }
 
+      // PHASE E — sweep + slowdown landing on drand winner
       if (cancelled) return;
       setPhase("sweep");
-      setCenter({ line1: `ROUND #${animationKey}`, line2: "- - -", line3: "STARTS IN A FEW SEC" });
-
-      // PHASE C — ring rebuild + fast sweep
+      setCenter({ line1: `ROUND #${animationKey}`, line2: "DRAND", line3: "PICKING WINNER" });
       let current = 1;
-      for (let t = 0; t < 75; t++) {
+      for (let t = 0; t < 60; t++) {
         if (cancelled) return;
         setHighlighted(current);
         if (t % 2 === 0) play(() => sounds.tick(600));
-        await sleep(20);
+        await sleep(22);
         current = (current % 30) + 1;
       }
-
-      // PHASE D — slowdown to winning tile
-      const speeds = [24, 30, 38, 50, 68, 92, 125, 165, 215, 280, 360, 460];
+      const speeds = [26, 34, 44, 58, 78, 105, 140, 185, 240, 310, 400];
       let speedIdx = 0;
       let safety = 0;
       while (safety++ < 200) {
@@ -150,7 +179,7 @@ export default function PvpWheelVisual({
         speedIdx++;
       }
 
-      // PHASE E — land on winner
+      // PHASE F — land on winner
       if (cancelled) return;
       setPhase("winner");
       setWinnerTile(winningTile);
@@ -165,9 +194,9 @@ export default function PvpWheelVisual({
         line3: youWon ? `YOU WON! +${(myPayout ?? pot).toFixed(3)} zkLTC` : "",
       });
       setTimeout(() => setShake(false), 600);
-      await sleep(2600);
+      await sleep(2400);
 
-      // PHASE F — new round loader
+      // PHASE G — new round loader
       setPhase("new-round");
       setDimOthers(false);
       setWinnerTile(null);
@@ -175,17 +204,18 @@ export default function PvpWheelVisual({
         if (cancelled) return;
         setCenter({ line1: "NEW ROUND IN", line2: String(c), countdown: true });
         play(() => sounds.tick(400 + (6 - c) * 40));
-        await sleep(1000);
+        await sleep(800);
       }
 
-      // PHASE G — reset + flash
+      // PHASE H — reset + flash
       if (cancelled) return;
       setFlash(true);
-      await sleep(300);
+      await sleep(260);
       setFlash(false);
       setHighlighted(null);
       setWinnerTile(null);
       setDimOthers(false);
+      setBlinkSet(null);
       setPhase("idle");
       setCenter({ line1: "ROUND OPEN", timer: true });
       setAnimating(false);
@@ -217,7 +247,7 @@ export default function PvpWheelVisual({
     const isMine = myTiles.has(tileLabel);
     const isHi = highlighted === tileLabel;
     const isWin = winnerTile === tileLabel;
-    const blink = allBlink;
+    const blink = blinkSet?.has(tileLabel) ?? false;
     const dim = dimOthers && !isWin;
     const phaseGlow = phase === "sweep" || phase === "new-round";
 
@@ -303,23 +333,16 @@ export default function PvpWheelVisual({
             const tileLabel = tile.id + 1;
             const isMine = myTiles.has(tileLabel);
             const interactive = isOpen && !animating;
-            const scatterActive = phase === "scatter" || phase === "logo";
-            const scatterRad = (tile.middleDegrees - 90) * Math.PI / 180;
-            const scatterDistance = phase === "logo" ? 128 : 58;
-            const scatterTransform = scatterActive
-              ? `translate(${Math.cos(scatterRad) * scatterDistance}px, ${Math.sin(scatterRad) * scatterDistance}px) rotate(${tile.middleDegrees * 0.12}deg) scale(${phase === "logo" ? 0.94 : 1})`
-              : s.transform;
-            const phaseOpacity = phase === "logo" && tileLabel > 12 && tileLabel < 23 ? 0.08 : s.opacity;
             return (
               <g
                 key={tile.id}
                 style={{
                   cursor: interactive ? "pointer" : "default",
                   filter: s.glow,
-                  transition: "filter 180ms ease, transform 700ms cubic-bezier(.2,.9,.2,1), opacity 450ms ease",
-                  transform: scatterTransform,
+                  transition: "filter 180ms ease, transform 400ms cubic-bezier(.2,.9,.2,1), opacity 240ms ease",
+                  transform: s.transform,
                   transformOrigin: "290px 290px",
-                  opacity: phaseOpacity,
+                  opacity: s.opacity,
                 }}
                 onPointerEnter={() => onTileEnter(tileLabel)}
                 onPointerLeave={onTileLeave}
@@ -335,7 +358,7 @@ export default function PvpWheelVisual({
                   stroke={s.stroke}
                   strokeWidth={s.strokeWidth}
                   opacity={s.opacity}
-                  style={{ transition: "fill 160ms ease, stroke 160ms ease, opacity 160ms ease" }}
+                  style={{ transition: "fill 140ms ease, stroke 140ms ease, opacity 140ms ease" }}
                 />
                 {isMine && (
                   <circle cx={tile.labelX} cy={tile.labelY - 8} r={3} fill="#22c55e">
@@ -356,13 +379,6 @@ export default function PvpWheelVisual({
           })}
         </svg>
 
-        {phase === "logo" && (
-          <div className="pvp-sol-loader" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-        )}
 
         {/* HOVER TOOLTIP */}
         {tooltipVisible && tooltipTile != null && tooltipPos && (
@@ -408,7 +424,7 @@ export default function PvpWheelVisual({
             padding: 14,
             zIndex: 20,
             overflow: "hidden",
-            opacity: phase === "logo" ? 0 : 1,
+            opacity: 1,
             transform: phase === "winner" ? "scale(1.04)" : "scale(1)",
             transition: "opacity 240ms ease, transform 240ms ease",
           }}
