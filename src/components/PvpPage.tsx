@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, Shield, History, ExternalLink } from "lucide-react";
+import { ArrowLeft, Shield, History, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAccount } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { BrowserProvider, Contract, parseEther } from "ethers";
@@ -300,7 +300,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
         .map(normalizeEndedRound)
         .filter((r): r is EndedRound => r != null)
         .sort((a, b) => b.round_id - a.round_id);
-      setHistory(normalized.slice(0, 10));
+      setHistory(normalized);
       if (normalized[0]) setLastResolvedRound((prev) => prev?.round_id === normalized[0].round_id ? prev : normalized[0]);
 
       const wantedRound = targetRoundId ?? pendingAnimationRoundRef.current;
@@ -649,44 +649,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           </div>
 
           {/* ENDED ROUNDS (right column) */}
-          <div style={{
-            background: "#ffffff", border: "2px solid #0f172a",
-            borderRadius: 14, padding: 18, boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)", color: "#0f172a",
-            display: "flex", flexDirection: "column", gap: 12,
-          }}>
-            <div className="side-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 0 }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                <History size={15} /> Ended Rounds
-              </span>
-              <span className="side-head" style={{
-                fontSize: 12, padding: "3px 10px", borderRadius: 999,
-                background: "rgba(124,92,255,.12)", color: "#7c5cff",
-                border: "1px solid rgba(124,92,255,.4)", marginBottom: 0,
-              }}>{history.length} Total</span>
-            </div>
-            <div style={{ borderTop: "1px solid rgba(15,23,42,.10)", paddingTop: 10, maxHeight: 560, overflowY: "auto" }}>
-              {history.length === 0 ? (
-                <div style={{ fontSize: 11, color: "#64748b" }}>No settled rounds yet.</div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {history.map((r) => (
-                    <div key={r.round_id}
-                      style={{
-                        background: "#ffffff", border: "1.5px solid #0f172a",
-                        borderRadius: 11, padding: "10px 12px",
-                        boxShadow: "2px 2px 0 0 rgba(15,23,42,.85)",
-                        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
-                      }}>
-                      <span className="mono" style={{ color: "#0f172a", fontWeight: 800, fontSize: 13 }}>
-                        #{r.round_id} · Tile <span style={{ color: "#7c5cff" }}>{r.winning_tile}</span>
-                      </span>
-                      <button className="verify-btn" onClick={() => openVerify(r.round_id)}>Verify</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          <EndedRoundsPanel history={history} onVerify={openVerify} />
         </div>
 
         
@@ -799,6 +762,89 @@ function PvpAccordion({ name, result, steps }: { name: string; result: string; s
               {val && <span className="sv">{val}</span>}
             </div>
           ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EndedRoundsPanel({ history, onVerify }: { history: EndedRound[]; onVerify: (id: number) => void }) {
+  const PAGE_SIZE = 10;
+  const [page, setPage] = React.useState(0);
+  const totalPages = Math.max(1, Math.ceil(history.length / PAGE_SIZE));
+  React.useEffect(() => { if (page >= totalPages) setPage(totalPages - 1); }, [page, totalPages]);
+  const safePage = Math.min(page, totalPages - 1);
+  const pageItems = history.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
+
+  const btn: React.CSSProperties = {
+    display: "inline-flex", alignItems: "center", gap: 4,
+    background: "#ffffff", border: "1.5px solid #0f172a",
+    color: "#0f172a", fontWeight: 800, fontSize: 11,
+    padding: "6px 10px", borderRadius: 8, cursor: "pointer",
+    fontFamily: "inherit", letterSpacing: ".05em", textTransform: "uppercase",
+    boxShadow: "2px 2px 0 0 rgba(15,23,42,.85)",
+  };
+
+  return (
+    <div style={{
+      background: "#ffffff", border: "2px solid #0f172a",
+      borderRadius: 14, padding: 18, boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)", color: "#0f172a",
+      display: "flex", flexDirection: "column", gap: 12,
+    }}>
+      <div className="side-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 0 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <History size={15} /> Ended Rounds
+        </span>
+        <span className="side-head" style={{
+          fontSize: 12, padding: "3px 10px", borderRadius: 999,
+          background: "rgba(124,92,255,.12)", color: "#7c5cff",
+          border: "1px solid rgba(124,92,255,.4)", marginBottom: 0,
+        }}>{history.length} Total</span>
+      </div>
+      <div style={{ borderTop: "1px solid rgba(15,23,42,.10)", paddingTop: 10, minHeight: 480 }}>
+        {history.length === 0 ? (
+          <div style={{ fontSize: 11, color: "#64748b" }}>No settled rounds yet.</div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {pageItems.map((r) => (
+              <div key={r.round_id}
+                style={{
+                  background: "#ffffff", border: "1.5px solid #0f172a",
+                  borderRadius: 11, padding: "10px 12px",
+                  boxShadow: "2px 2px 0 0 rgba(15,23,42,.85)",
+                  display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
+                }}>
+                <span className="mono" style={{ color: "#0f172a", fontWeight: 800, fontSize: 13 }}>
+                  #{r.round_id} · Tile <span style={{ color: "#7c5cff" }}>{r.winning_tile}</span>
+                </span>
+                <button className="verify-btn" onClick={() => onVerify(r.round_id)}>Verify</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {history.length > PAGE_SIZE && (
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          gap: 8, paddingTop: 8, borderTop: "1px solid rgba(15,23,42,.10)",
+        }}>
+          <button
+            style={{ ...btn, opacity: safePage <= 0 ? 0.4 : 1, cursor: safePage <= 0 ? "not-allowed" : "pointer" }}
+            disabled={safePage <= 0}
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+          >
+            <ChevronLeft size={12} /> Prev
+          </button>
+          <span style={{ fontSize: 11, color: "#475569", fontWeight: 800, letterSpacing: ".05em" }}>
+            Page {safePage + 1} of {totalPages}
+          </span>
+          <button
+            style={{ ...btn, opacity: safePage >= totalPages - 1 ? 0.4 : 1, cursor: safePage >= totalPages - 1 ? "not-allowed" : "pointer" }}
+            disabled={safePage >= totalPages - 1}
+            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+          >
+            Next <ChevronRight size={12} />
+          </button>
         </div>
       )}
     </div>
