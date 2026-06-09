@@ -452,20 +452,14 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           <div><h1>Bets<b>On</b>Block</h1></div>
         </div>
         <div style={{ flex: 1 }} />
-        <div className="top-right">
-          <div className="live-head"><span className="pulse" /> PVP <b className="mono" style={{ marginLeft: 4 }}>#{status?.round_id ?? "…"}</b></div>
-        </div>
+        <div className="live-head"><span className="pulse" /> PVP <b className="mono" style={{ marginLeft: 4 }}>#{status?.round_id ?? "…"}</b></div>
+        <div style={{ flex: 1 }} />
+        <div className="top-right" />
       </div>
 
-      <div className="wrap">
-        <button className="back-link" onClick={onBack} style={{ color: "#0f172a" }}><ArrowLeft size={14} /> Back to home</button>
+      <div className="wrap" style={{ paddingTop: 12 }}>
+        <button className="back-link" onClick={onBack} style={{ color: "#0f172a", marginBottom: 10 }}><ArrowLeft size={14} /> Back to home</button>
 
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 18 }}>
-          <div>
-            <h1 className="page-title" style={{ color: "#0f172a" }}>PVP Wheel</h1>
-            <p className="page-sub" style={{ color: "#475569" }}>Bet on tiles 1–30. Drand decides the winner. One bet per tile per round.</p>
-          </div>
-        </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "320px 1fr 320px", gap: 22, alignItems: "start" }}>
           {/* BET PANEL */}
