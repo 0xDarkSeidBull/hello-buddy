@@ -634,6 +634,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
                 pot={animationWinner?.total_pool ?? status?.total_pool ?? 0}
                 winningTile={animationWinner?.winning_tile ?? null}
                 animationRoundId={animationWinner?.round_id ?? null}
+                isBonanza={animationWinner?.is_bonanza === 1}
                 myTiles={myTilesThisRound}
                 myPayout={(() => {
                   if (!addr || !animationWinner?.payouts) return null;
@@ -653,6 +654,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
                   prevRoundRef.current = null;
                 }}
               />
+
             </div>
           </div>
 
