@@ -171,22 +171,22 @@ export default function AboutPage({ onBack }: { onBack: () => void }) {
 
         {/* SECTION 2 */}
         <div style={sectionWrap}>
-          <h3 style={sectionTitle}>2 · Payout Formula</h3>
-          <pre style={codeBlock}>{`Step 1 — Protocol fee
-  fee = totalPool × 5%
+          <h3 style={sectionTitle}>2 Payout Formula</h3>
+          <pre style={codeBlock}>{`Step 1: Protocol fee
+  fee = totalPool x 5%
 
-Step 2 — Prize pool
-  prize = totalPool × 95%
+Step 2: Prize pool
+  prize = totalPool x 95%
 
-Step 3 — Your share of winning tile
-  share = yourBetOnWinTile ÷ totalBetsOnWinTile
+Step 3: Your share of winning tile
+  share = yourBetOnWinTile / totalBetsOnWinTile
 
-Step 4 — Your payout
-  payout = prize × share
-         = totalPool × 0.95 × (yourBet ÷ winTileTotal)
+Step 4: Your payout
+  payout = prize x share
+         = totalPool x 0.95 x (yourBet / winTileTotal)
 
-Multiplier = payout ÷ yourBet
-           = (totalPool × 0.95) ÷ totalOnWinTile`}</pre>
+Multiplier = payout / yourBet
+           = (totalPool x 0.95) / totalOnWinTile`}</pre>
           <div className="about-grid-3" style={{ marginTop: 12 }}>
             <ResultCard label="Tile = 5% of pool" value="19×" color={GREEN} />
             <ResultCard label="Tile = 20% of pool" value="4.75×" color={BLUE} />
