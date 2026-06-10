@@ -17,6 +17,7 @@ import PointsToast from "./components/PointsToast";
 import YourPointsModal from "./components/YourPointsModal";
 import HeaderStats from "./components/HeaderStats";
 import PvpPage from "./components/PvpPage";
+import AboutPage from "./components/AboutPage";
 import { sounds } from "./lib/pvpSounds";
 
 function PvpButton({ onClick }: { onClick: () => void }) {
@@ -42,17 +43,18 @@ function PvpButton({ onClick }: { onClick: () => void }) {
 }
 
 export default function App() {
-  const initialView = (): "home" | "zone" | "pvp" => {
+  const initialView = (): "home" | "zone" | "pvp" | "about" => {
     if (typeof window === "undefined") return "home";
+    if (window.location.pathname.startsWith("/about")) return "about";
     if (window.location.pathname.startsWith("/pvp")) return "pvp";
     if (window.location.pathname.startsWith("/bettingzone")) return "zone";
     return "home";
   };
-  const [view, setView] = React.useState<"home" | "zone" | "pvp">(initialView);
+  const [view, setView] = React.useState<"home" | "zone" | "pvp" | "about">(initialView);
 
-  const goView = React.useCallback((next: "home" | "zone" | "pvp") => {
+  const goView = React.useCallback((next: "home" | "zone" | "pvp" | "about") => {
     setView(next);
-    const path = next === "zone" ? "/bettingzone" : next === "pvp" ? "/pvp" : "/";
+    const path = next === "zone" ? "/bettingzone" : next === "pvp" ? "/pvp" : next === "about" ? "/about" : "/";
     if (typeof window !== "undefined" && window.location.pathname !== path) {
       window.history.pushState({}, "", path);
     }
@@ -166,6 +168,10 @@ export default function App() {
 
   const totalLiveStaked = rounds.reduce((s, r) => s + r.totalStaked, 0);
   const totalLivePlayers = rounds.reduce((s, r) => s + r.players, 0);
+
+  if (view === "about") {
+    return <AboutPage onBack={() => goView("pvp")} />;
+  }
 
   if (view === "pvp") {
     return <PvpPage onBack={() => goView("home")} />;
