@@ -547,8 +547,20 @@ export default function PvpPage({ onBack, onAbout }: { onBack: () => void; onAbo
 
 
 
-  // wheel geometry
-  const SIZE = 560;
+  // wheel geometry (responsive: shrinks on mobile)
+  const [SIZE, setSIZE] = React.useState<number>(() => {
+    if (typeof window === "undefined") return 560;
+    const w = window.innerWidth;
+    return w < 768 ? Math.min(Math.max(w - 48, 280), 400) : 560;
+  });
+  React.useEffect(() => {
+    const calc = () => {
+      const w = window.innerWidth;
+      setSIZE(w < 768 ? Math.min(Math.max(w - 48, 280), 400) : 560);
+    };
+    window.addEventListener("resize", calc);
+    return () => window.removeEventListener("resize", calc);
+  }, []);
 
   // approximate total round window for progress bar — use whatever we last saw
   const totalRoundMsRef = React.useRef<number>(60000);
