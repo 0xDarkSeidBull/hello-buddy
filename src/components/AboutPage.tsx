@@ -235,7 +235,7 @@ Multiplier = payout / yourBet
             </ResponsiveContainer>
           </div>
           <div style={{ fontSize: 12.5, color: MUTED, marginTop: 8, lineHeight: 1.6 }}>
-            Lower tile coverage = higher multiplier, higher risk. Higher tile coverage = lower multiplier, safer bet. EV is always −5% regardless of strategy.
+            Lower tile coverage = higher multiplier, higher risk. Higher tile coverage = lower multiplier, safer bet. EV is always -5% regardless of strategy.
           </div>
         </div>
 
@@ -268,12 +268,12 @@ Multiplier = payout / yourBet
           <h3 style={sectionTitle}>6 Expected Value (Any Strategy)</h3>
           <pre style={codeBlock}>{`For ANY bet amount I across ANY tiles:
 
-Expected Return = I × 0.95
-Expected Loss   = I × 0.05
+Expected Return = I x 0.95
+Expected Loss   = I x 0.05
 
-Covering 1 tile:   EV = −5%
-Covering 15 tiles: EV = −5%
-Covering 30 tiles: EV = −5%
+Covering 1 tile:   EV = -5%
+Covering 15 tiles: EV = -5%
+Covering 30 tiles: EV = -5%
 
 Strategy only changes VARIANCE, not EV.
 Fewer tiles = high variance (boom or bust)
@@ -315,7 +315,7 @@ More tiles  = low variance (steady small returns)`}</pre>
             <div style={{ color: GREEN, fontWeight: 900, marginBottom: 4 }}>✓ Self-verify any past round:</div>
             1. Find round's Drand number in Ended Rounds<br />
             2. Visit the URL above with that number<br />
-            3. Run the formula — result matches our tile
+            3. Run the formula - result matches our tile
           </div>
         </div>
 
@@ -344,7 +344,7 @@ More tiles  = low variance (steady small returns)`}</pre>
             </div>
           </div>
           <div style={{ fontSize: 13, color: MUTED, marginTop: 12, lineHeight: 1.6 }}>
-            Bonanza designation is hidden until round resolves — you won't know in advance. Revealed with special animation after resolution. Bonanza rounds appear with 🎉 badge in round history.
+            Bonanza designation is hidden until round resolves - you won't know in advance. Revealed with special animation after resolution. Bonanza rounds appear with 🎉 badge in round history.
           </div>
         </div>
       </div>
