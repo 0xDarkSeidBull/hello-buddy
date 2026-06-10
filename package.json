@@ -21,6 +21,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-jazzicon": "^1.0.4",
+    "recharts": "^3.8.1",
     "viem": "^2.52.0",
     "wagmi": "^2.12.0"
   },
