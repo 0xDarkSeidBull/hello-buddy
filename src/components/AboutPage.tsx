@@ -160,7 +160,7 @@ export default function AboutPage({ onBack }: { onBack: () => void }) {
 
         {/* SECTION 1 */}
         <div style={sectionWrap}>
-          <h3 style={sectionTitle}>1 · Round Flow</h3>
+          <h3 style={sectionTitle}>1 Round Flow</h3>
           <div className="about-grid-4">
             <PhaseCard n={1} label="OPEN" desc="Players bet on 1–30 tiles" color={BLUE} />
             <PhaseCard n={2} label="LOCK" desc="No more bets accepted" color={GOLD} />
