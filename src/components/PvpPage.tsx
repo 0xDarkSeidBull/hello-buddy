@@ -116,7 +116,7 @@ function normalizeEndedRound(raw: any): EndedRound | null {
 }
 
 
-export default function PvpPage({ onBack }: { onBack: () => void }) {
+export default function PvpPage({ onBack, onAbout }: { onBack: () => void; onAbout?: () => void }) {
   const { address, isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
   const addr = isConnected && address ? address.toLowerCase() : null;
@@ -576,7 +576,7 @@ export default function PvpPage({ onBack }: { onBack: () => void }) {
           </div>
         </div>
         <div style={{ marginLeft: "auto", display: "inline-flex", alignItems: "center", gap: 10 }}>
-          <AboutModal />
+          <AboutModal onOpen={onAbout} />
           <MyBetsModal address={addr} refreshKey={myBetsRefresh} />
           <span className="live-head" style={{ display: "inline-flex", alignItems: "center" }}><span className="pulse" /> PVP <b className="mono" style={{ marginLeft: 4 }}>#{status?.round_id ?? "…"}</b></span>
         </div>

@@ -174,7 +174,7 @@ export default function App() {
   }
 
   if (view === "pvp") {
-    return <PvpPage onBack={() => goView("home")} />;
+    return <PvpPage onBack={() => goView("home")} onAbout={() => goView("about")} />;
   }
 
   if (view === "home") {
