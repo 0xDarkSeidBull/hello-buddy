@@ -617,7 +617,7 @@ export default function PvpPage({ onBack, onAbout }: { onBack: () => void; onAbo
 
 
 
-        <div style={{ display: "grid", gridTemplateColumns: "320px 1fr 320px", gap: 22, alignItems: "start" }}>
+        <div className="pvp-3col" style={{ display: "grid", gridTemplateColumns: "320px 1fr 320px", gap: 22, alignItems: "start" }}>
           {/* BET PANEL */}
           <BetPanel
             roundId={status?.round_id ?? null}
@@ -639,9 +639,9 @@ export default function PvpPage({ onBack, onAbout }: { onBack: () => void; onAbo
           />
 
           {/* WHEEL COLUMN */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div className="pvp-wheel-col" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {/* WHEEL */}
-            <div style={{
+            <div className="pvp-wheel-card" style={{
               background: "radial-gradient(ellipse at center, #ffffff 0%, #f1f3f7 75%)",
               border: "2px solid #0f172a", borderRadius: 22,
               boxShadow: "4px 4px 0 0 rgba(15,23,42,.9)",
