@@ -124,6 +124,7 @@ export default function PvpPage({ onBack, onAbout }: { onBack: () => void; onAbo
   const [status, setStatus] = React.useState<Status | null>(null);
   const [statusFetchedAt, setStatusFetchedAt] = React.useState<number>(Date.now());
   const [history, setHistory] = React.useState<EndedRound[]>([]);
+  const [historyLoading, setHistoryLoading] = React.useState(true);
   const [myBets, setMyBets] = React.useState<MyBet[]>([]);
   const [selectedTiles, setSelectedTilesState] = React.useState<Set<number>>(new Set());
   const selectedTilesRef = React.useRef<Set<number>>(new Set());
@@ -295,6 +296,7 @@ export default function PvpPage({ onBack, onAbout }: { onBack: () => void; onAbo
 
   // poll history every 10s
   const loadHistory = React.useCallback(async (targetRoundId?: number | null) => {
+    setHistoryLoading(true);
     try {
       const r = await fetch(HISTORY_URL, { cache: "no-store" });
       if (!r.ok) { console.error("[BetsOnBlock] history http", r.status); return; }
@@ -321,6 +323,7 @@ export default function PvpPage({ onBack, onAbout }: { onBack: () => void; onAbo
         scheduleWinnerRetry(wantedRound);
       }
     } catch (e) { console.error("[BetsOnBlock] history fetch error:", e); }
+    finally { setHistoryLoading(false); }
   }, [runAfterVisibleZero, scheduleWinnerRetry, startAnimationForWinner]);
   React.useEffect(() => { loadHistoryRef.current = loadHistory; }, [loadHistory]);
   React.useEffect(() => () => {
@@ -673,7 +676,7 @@ export default function PvpPage({ onBack, onAbout }: { onBack: () => void; onAbo
           </div>
 
           {/* ENDED ROUNDS (right column) */}
-          <EndedRoundsPanel history={history} onVerify={openVerify} />
+          <EndedRoundsPanel history={history} loading={historyLoading} onVerify={openVerify} />
         </div>
 
         
@@ -792,7 +795,7 @@ function PvpAccordion({ name, result, steps }: { name: string; result: string; s
   );
 }
 
-function EndedRoundsPanel({ history, onVerify }: { history: EndedRound[]; onVerify: (id: number) => void }) {
+function EndedRoundsPanel({ history, loading, onVerify }: { history: EndedRound[]; loading: boolean; onVerify: (id: number) => void }) {
   const PAGE_SIZE = 10;
   const [page, setPage] = React.useState(0);
   const totalPages = Math.max(1, Math.ceil(history.length / PAGE_SIZE));
@@ -826,7 +829,12 @@ function EndedRoundsPanel({ history, onVerify }: { history: EndedRound[]; onVeri
         }}>{history.length} Total</span>
       </div>
       <div style={{ borderTop: "1px solid rgba(15,23,42,.10)", paddingTop: 10, minHeight: 480 }}>
-        {history.length === 0 ? (
+        {loading && history.length === 0 ? (
+          <div style={{ fontSize: 13, color: "#64748b", display: "flex", alignItems: "center", gap: 10, padding: "24px 0" }}>
+            <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#7c5cff", display: "inline-block", animation: "pulse 1.4s cubic-bezier(0.4,0,0.6,1) infinite" }} />
+            Loading rounds…
+          </div>
+        ) : history.length === 0 ? (
           <div style={{ fontSize: 11, color: "#64748b" }}>No settled rounds yet.</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
