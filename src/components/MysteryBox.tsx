@@ -1,6 +1,6 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import boxAsset from "@/assets/mystery-box.png.asset.json";
+import boxImg from "@/assets/mystery-box-3d.png";
 
 type Rarity = "common" | "rare" | "epic" | "legendary";
 
@@ -52,6 +52,29 @@ export default function MysteryBox({
   const [open, setOpen] = React.useState(false);
   const [stage, setStage] = React.useState<"idle" | "shake" | "burst" | "reveal">("idle");
   const [reward, setReward] = React.useState<{ rarity: Rarity; points: number } | null>(null);
+  const [rotY, setRotY] = React.useState(-20);
+  const [rotX, setRotX] = React.useState(-15);
+  const dragRef = React.useRef<{ x: number; y: number; rx: number; ry: number; moved: boolean } | null>(null);
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (stage !== "idle") return;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    dragRef.current = { x: e.clientX, y: e.clientY, rx: rotX, ry: rotY, moved: false };
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!dragRef.current) return;
+    const dx = e.clientX - dragRef.current.x;
+    const dy = e.clientY - dragRef.current.y;
+    if (Math.abs(dx) + Math.abs(dy) > 4) dragRef.current.moved = true;
+    setRotY(dragRef.current.ry + dx * 0.6);
+    setRotX(Math.max(-80, Math.min(80, dragRef.current.rx - dy * 0.6)));
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    const moved = dragRef.current?.moved;
+    dragRef.current = null;
+    if (!moved && canClaimRef.current && stage === "idle") onBoxClick();
+  };
+  const canClaimRef = React.useRef(false);
 
   React.useEffect(() => {
     if (!walletAddress) {
@@ -77,6 +100,7 @@ export default function MysteryBox({
 
   const canClaim = !!walletAddress && state.betsProgress >= BETS_NEEDED && state.todayBoxes < MAX_BOXES;
   const maxed = state.todayBoxes >= MAX_BOXES;
+  canClaimRef.current = canClaim;
 
   const openModal = () => {
     setStage("idle");
@@ -235,31 +259,41 @@ export default function MysteryBox({
 
             {/* BOX */}
             <div
-              onClick={onBoxClick}
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={onPointerUp}
+              onPointerCancel={onPointerUp}
               style={{
-                width: 180, height: 180, position: "relative",
+                width: 200, height: 200, position: "relative",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: canClaim && stage === "idle" ? "pointer" : "default",
+                cursor: stage === "idle" ? (canClaim ? "grab" : "grab") : "default",
+                touchAction: "none",
+                perspective: "800px",
+                userSelect: "none",
               }}
             >
               {stage !== "reveal" && (
                 <img
-                  src={boxAsset.url}
+                  src={boxImg}
                   alt="Mystery Box"
+                  draggable={false}
                   className={
-                    stage === "shake" ? undefined
+                    stage === "shake" || dragRef.current ? undefined
                     : canClaim ? "mbx-wiggle-ready"
                     : "mbx-float-idle"
                   }
                   style={{
                     width: "100%", height: "100%", objectFit: "contain",
+                    transform: `rotateX(${rotX}deg) rotateY(${rotY}deg)`,
+                    transformStyle: "preserve-3d",
+                    transition: dragRef.current ? "none" : "transform .15s ease-out, filter .2s ease",
                     animation: stage === "shake" ? "mbx-shake .25s ease-in-out infinite"
                       : stage === "burst" ? "mbx-burst .5s ease-out forwards"
                       : undefined,
                     filter: canClaim
                       ? "drop-shadow(0 0 16px rgba(255,215,0,.65))"
                       : "drop-shadow(0 6px 12px rgba(0,0,0,.35))",
-                    transition: "filter .2s ease",
+                    pointerEvents: "none",
                   }}
                 />
               )}
