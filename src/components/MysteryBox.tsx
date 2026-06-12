@@ -183,7 +183,7 @@ export default function MysteryBox({
         <div
           onClick={closeModal}
           style={{
-            position: "fixed", inset: 0, zIndex: 9999,
+            position: "fixed", inset: 0, zIndex: 50,
             background: "rgba(0,0,0,.75)",
             display: "flex", alignItems: "center", justifyContent: "center",
             padding: 20,
