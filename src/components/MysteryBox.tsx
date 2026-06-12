@@ -100,6 +100,7 @@ export default function MysteryBox({
 
   const canClaim = !!walletAddress && state.betsProgress >= BETS_NEEDED && state.todayBoxes < MAX_BOXES;
   const maxed = state.todayBoxes >= MAX_BOXES;
+  canClaimRef.current = canClaim;
 
   const openModal = () => {
     setStage("idle");
