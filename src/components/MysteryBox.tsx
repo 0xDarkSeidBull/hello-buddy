@@ -259,31 +259,41 @@ export default function MysteryBox({
 
             {/* BOX */}
             <div
-              onClick={onBoxClick}
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={onPointerUp}
+              onPointerCancel={onPointerUp}
               style={{
-                width: 180, height: 180, position: "relative",
+                width: 200, height: 200, position: "relative",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: canClaim && stage === "idle" ? "pointer" : "default",
+                cursor: stage === "idle" ? (canClaim ? "grab" : "grab") : "default",
+                touchAction: "none",
+                perspective: "800px",
+                userSelect: "none",
               }}
             >
               {stage !== "reveal" && (
                 <img
-                  src={boxAsset.url}
+                  src={boxImg}
                   alt="Mystery Box"
+                  draggable={false}
                   className={
-                    stage === "shake" ? undefined
+                    stage === "shake" || dragRef.current ? undefined
                     : canClaim ? "mbx-wiggle-ready"
                     : "mbx-float-idle"
                   }
                   style={{
                     width: "100%", height: "100%", objectFit: "contain",
+                    transform: `rotateX(${rotX}deg) rotateY(${rotY}deg)`,
+                    transformStyle: "preserve-3d",
+                    transition: dragRef.current ? "none" : "transform .15s ease-out, filter .2s ease",
                     animation: stage === "shake" ? "mbx-shake .25s ease-in-out infinite"
                       : stage === "burst" ? "mbx-burst .5s ease-out forwards"
                       : undefined,
                     filter: canClaim
                       ? "drop-shadow(0 0 16px rgba(255,215,0,.65))"
                       : "drop-shadow(0 6px 12px rgba(0,0,0,.35))",
-                    transition: "filter .2s ease",
+                    pointerEvents: "none",
                   }}
                 />
               )}
