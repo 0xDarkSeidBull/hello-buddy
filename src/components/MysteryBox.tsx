@@ -282,9 +282,9 @@ export default function MysteryBox({
                   }
                   style={{
                     width: "100%", height: "100%", objectFit: "contain",
-                    transform: `rotateX(${rotX}deg) rotateY(${rotY}deg)`,
-                    transformStyle: "preserve-3d",
-                    transition: dragRef.current ? "none" : "transform .15s ease-out, filter .2s ease",
+                    transform: `rotate(${rotZ}deg)`,
+                    transformOrigin: "50% 50%",
+                    transition: dragRef.current ? "none" : "transform .25s cubic-bezier(.22,.61,.36,1), filter .2s ease",
                     animation: stage === "shake" ? "mbx-shake .25s ease-in-out infinite"
                       : stage === "burst" ? "mbx-burst .5s ease-out forwards"
                       : undefined,
@@ -292,6 +292,7 @@ export default function MysteryBox({
                       ? "drop-shadow(0 0 16px rgba(255,215,0,.65))"
                       : "drop-shadow(0 6px 12px rgba(0,0,0,.35))",
                     pointerEvents: "none",
+                    willChange: "transform",
                   }}
                 />
               )}
