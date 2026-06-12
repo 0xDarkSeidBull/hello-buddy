@@ -1,6 +1,7 @@
 import React from "react";
 import Coin from "./Coin";
-import MysteryBox from "./MysteryBox";
+
+
 
 
 
@@ -175,9 +176,6 @@ export default function BetPanel({
           }}>×</button>
         </div>
       </div>
-
-      {/* MYSTERY BOX */}
-      <MysteryBox walletAddress={walletAddress ?? null} totalBetsPlaced={betsPlacedCount} />
 
       {/* AMOUNT */}
       <div>
