@@ -180,11 +180,11 @@ export default function MysteryBox({
         )}
       </button>
 
-      {open && (
+      {open && createPortal((
         <div
           onClick={closeModal}
           style={{
-            position: "fixed", inset: 0, zIndex: 50,
+            position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
             background: "rgba(0,0,0,.75)",
             display: "flex", alignItems: "center", justifyContent: "center",
             padding: 20,
