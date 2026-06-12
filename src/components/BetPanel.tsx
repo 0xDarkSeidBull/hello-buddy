@@ -176,6 +176,9 @@ export default function BetPanel({
         </div>
       </div>
 
+      {/* MYSTERY BOX */}
+      <MysteryBox walletAddress={walletAddress ?? null} totalBetsPlaced={betsPlacedCount} />
+
       {/* AMOUNT */}
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 8, flexWrap: "wrap" }}>
