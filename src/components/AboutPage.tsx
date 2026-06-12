@@ -321,7 +321,32 @@ More tiles  = low variance (steady small returns)`}</pre>
 
         {/* SECTION 8 */}
         <div style={sectionWrap}>
-          <h3 style={sectionTitle}>8 Bonanza Rounds</h3>
+          <h3 style={sectionTitle}>8 Mystery Box</h3>
+          <div className="about-grid-3">
+            <ResultCard label="Unlock rule" value="10 bets = 1 box" color={BLUE} />
+            <ResultCard label="Daily limit" value="3 boxes" color={GOLD} />
+            <ResultCard label="Reset" value="Every day" color={GREEN} />
+          </div>
+          <div style={{ fontSize: 13, color: MUTED, marginTop: 12, lineHeight: 1.7 }}>
+            Mystery Box rewards active players with bonus LitDEX Points. Place 10 bets to unlock one box, tap the box to claim, and repeat until the daily limit is reached. Claim status is tracked by wallet, so your progress follows the connected address.
+          </div>
+          <div className="about-grid-4" style={{ marginTop: 12 }}>
+            <PhaseCard n={1} label="COMMON" desc="Small bonus reward: 5–20 points" color="#CD853F" />
+            <PhaseCard n={2} label="RARE" desc="Better box reward: 25–60 points" color="#0284c7" />
+            <PhaseCard n={3} label="EPIC" desc="High-value reward: 75–150 points" color="#9333ea" />
+            <PhaseCard n={4} label="LEGENDARY" desc="Top reward: 200–500 points" color={GOLD} />
+          </div>
+          <pre style={{ ...codeBlock, marginTop: 12 }}>{`Mystery Box flow:
+1. Connect wallet
+2. Place bets in live rounds
+3. Every 10 bets unlocks 1 claim
+4. Open up to 3 boxes per day
+5. Bonus points are added after the claim result`}</pre>
+        </div>
+
+        {/* SECTION 9 */}
+        <div style={sectionWrap}>
+          <h3 style={sectionTitle}>9 Bonanza Rounds</h3>
           <div className="about-grid-2">
             <div style={{ ...card }}>
               <div style={{ fontWeight: 900, fontSize: 14, marginBottom: 8, color: INK }}>Normal Round</div>

@@ -1,11 +1,13 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import boxImg from "@/assets/mystery-box-3d.png";
+import boxImg from "@/assets/mystery-box-3d-fast.webp";
 
-// Preload the box image once at module load so the modal opens instantly
+// Preload and decode the optimized box image once so the modal opens instantly.
 if (typeof window !== "undefined") {
   const img = new Image();
+  img.decoding = "async";
   img.src = boxImg;
+  img.decode?.().catch(() => undefined);
 }
 
 type Rarity = "common" | "rare" | "epic" | "legendary";
@@ -81,6 +83,7 @@ export default function MysteryBox({
   const [stage, setStage] = React.useState<"idle" | "shake" | "burst" | "reveal">("idle");
   const [reward, setReward] = React.useState<{ rarity: Rarity; points: number } | null>(null);
   const [rotZ, setRotZ] = React.useState(0);
+  const [statusReady, setStatusReady] = React.useState(false);
   const dragRef = React.useRef<{ x: number; y: number; rz: number; moved: boolean } | null>(null);
 
   const onPointerDown = (e: React.PointerEvent) => {
@@ -112,11 +115,13 @@ export default function MysteryBox({
       if (!r.ok) return;
       const j = await r.json();
       setState(normalizeStatus(j));
+      setStatusReady(true);
     } catch { /* */ }
   }, [walletAddress]);
 
   React.useEffect(() => {
     if (!walletAddress) {
+      setStatusReady(false);
       setState({
         betsProgress: 0, todayBoxes: 0,
         betsNeeded: DEFAULT_BETS_NEEDED, maxBoxes: DEFAULT_MAX_BOXES,
@@ -397,7 +402,7 @@ export default function MysteryBox({
             {/* BOTTOM: bets progress */}
             {stage !== "reveal" && (
               <>
-                {!maxed && (
+                {statusReady && !maxed && (
                   <>
                     <div style={{
                       display: "inline-flex", alignItems: "center", gap: 8,
@@ -429,9 +434,11 @@ export default function MysteryBox({
                   {!walletAddress
                     ? "Connect wallet to start collecting"
                     : maxed
-                    ? "All 3 boxes claimed — come back tomorrow"
+                    ? "All 3 boxes claimed. Come back tomorrow"
                     : canClaim
                     ? "Tap the box to open!"
+                    : !statusReady
+                    ? "Checking box status"
                     : `Place ${state.betsNeeded - state.betsProgress} more bet${state.betsNeeded - state.betsProgress === 1 ? "" : "s"} to unlock`}
                 </div>
               </>
