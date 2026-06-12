@@ -305,7 +305,7 @@ export default function MysteryBox({
             }}>
               <span>{state.todayBoxes}</span>
               <span style={{ opacity: .6 }}>/</span>
-              <span>{MAX_BOXES}</span>
+              <span>{state.maxBoxes}</span>
               <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", marginLeft: 4 }}>claims today</span>
             </div>
 
