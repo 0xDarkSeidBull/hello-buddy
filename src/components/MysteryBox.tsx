@@ -246,15 +246,15 @@ export default function MysteryBox({
             {/* TOP: claims left today */}
             <div style={{
               display: "inline-flex", alignItems: "center", gap: 8,
-              background: "#fff7ed", border: "2px solid #000", borderRadius: 999,
+              background: "#3b82f6", border: "2px solid #000", borderRadius: 8,
               padding: "6px 14px", fontWeight: 900, fontSize: 13,
-              fontFamily: "ui-monospace,monospace", color: "#0a0a0a",
-              boxShadow: "3px 3px 0 0 rgba(0,0,0,.9)",
+              fontFamily: "ui-monospace,monospace", color: "#fff",
+              boxShadow: "2px 2px 0 0 #000",
             }}>
-              <span style={{ color: "#cc0000" }}>{state.todayBoxes}</span>
-              <span style={{ opacity: .5 }}>/</span>
+              <span>{state.todayBoxes}</span>
+              <span style={{ opacity: .6 }}>/</span>
               <span>{MAX_BOXES}</span>
-              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "#475569", marginLeft: 4 }}>claims today</span>
+              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", marginLeft: 4 }}>claims today</span>
             </div>
 
             {/* BOX */}
