@@ -2,6 +2,12 @@ import React from "react";
 import { createPortal } from "react-dom";
 import boxImg from "@/assets/mystery-box-3d.png";
 
+// Preload the box image once at module load so the modal opens instantly
+if (typeof window !== "undefined") {
+  const img = new Image();
+  img.src = boxImg;
+}
+
 type Rarity = "common" | "rare" | "epic" | "legendary";
 
 const RARITY = {
