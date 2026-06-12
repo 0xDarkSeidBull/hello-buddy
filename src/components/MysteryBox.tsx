@@ -52,22 +52,20 @@ export default function MysteryBox({
   const [open, setOpen] = React.useState(false);
   const [stage, setStage] = React.useState<"idle" | "shake" | "burst" | "reveal">("idle");
   const [reward, setReward] = React.useState<{ rarity: Rarity; points: number } | null>(null);
-  const [rotY, setRotY] = React.useState(-20);
-  const [rotX, setRotX] = React.useState(-15);
-  const dragRef = React.useRef<{ x: number; y: number; rx: number; ry: number; moved: boolean } | null>(null);
+  const [rotZ, setRotZ] = React.useState(0);
+  const dragRef = React.useRef<{ x: number; y: number; rz: number; moved: boolean } | null>(null);
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (stage !== "idle") return;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    dragRef.current = { x: e.clientX, y: e.clientY, rx: rotX, ry: rotY, moved: false };
+    dragRef.current = { x: e.clientX, y: e.clientY, rz: rotZ, moved: false };
   };
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragRef.current) return;
     const dx = e.clientX - dragRef.current.x;
     const dy = e.clientY - dragRef.current.y;
     if (Math.abs(dx) + Math.abs(dy) > 4) dragRef.current.moved = true;
-    setRotY(dragRef.current.ry + dx * 0.6);
-    setRotX(Math.max(-80, Math.min(80, dragRef.current.rx - dy * 0.6)));
+    setRotZ(dragRef.current.rz + dx * 0.8);
   };
   const onPointerUp = (e: React.PointerEvent) => {
     const moved = dragRef.current?.moved;
