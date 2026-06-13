@@ -59,6 +59,18 @@ export default function BetPanel({
   const [rounds, setRounds] = React.useState("1");
   const [autoReload, setAutoReload] = React.useState(false);
 
+  // Reset selection + amount whenever wallet changes
+  const prevWalletRef = React.useRef(walletAddress);
+  React.useEffect(() => {
+    if (walletAddress !== prevWalletRef.current) {
+      prevWalletRef.current = walletAddress;
+      setSelectedTiles(new Set());
+      setAmount("0.01");
+      setRounds("1");
+      setAutoReload(false);
+    }
+  }, [walletAddress, setSelectedTiles]);
+
   const count = selectedTiles.size;
   const amt = Number(amount) || 0;
   const roundsNum = Math.max(1, Math.min(20, Number(rounds) || 1));
