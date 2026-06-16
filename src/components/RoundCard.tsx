@@ -374,6 +374,9 @@ export default function RoundCard({
               </div>
               <div className="pm-bar"><div className="em-fill" style={{ width: `${votedA}%` }} /></div>
               <div className="pm-players"><span>{playersA} players</span><span>{playersB} players</span></div>
+              <div style={{ fontSize: 12, color: "var(--text-2)", margin: "6px 0 8px", textAlign: "center" }}>
+                <span>If matched: <b style={{ color: "#00e5ff" }}><Coin size={13} /> 0.0196 zkLTC</b></span>
+              </div>
               <div className="pm-actions">
                 <button className="pm-yes glow" disabled={!isOpen} onClick={() => openBet(sideA)}>
                   <LeverSwitch pulled={leverPulled === sideA} side={sideA} size={26} />
