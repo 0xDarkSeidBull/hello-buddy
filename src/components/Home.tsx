@@ -32,6 +32,7 @@ export default function Home({ onEnter, onPvp }: { onEnter: () => void; onPvp?: 
           <div><b>~0.2s</b><span>block time</span></div>
           <div><b>8</b><span>game modes</span></div>
           <div><b>100%</b><span>verifiable</span></div>
+          <div><b>PVP</b><span>no house edge</span></div>
         </div>
       </section>
 
@@ -49,7 +50,7 @@ export default function Home({ onEnter, onPvp }: { onEnter: () => void; onPvp?: 
             <div className="num">2</div>
             <Dice5 size={22} />
             <h3>Choose your bet</h3>
-            <p>Coin flip, hi-lo, lucky digit, number 0-99, transaction over/under, gas, closest pool, or Perfect Block (50×). Stack as many as you like, each is a flat 0.01 zkLTC.</p>
+            <p>Coin flip, hi-lo, lucky digit, number 0-99, transaction over/under, gas, closest pool, or Perfect Block. Each bet is a flat 0.01 zkLTC — matched against real opponents.</p>
           </div>
           <div className="step">
             <div className="num">3</div>
@@ -61,7 +62,7 @@ export default function Home({ onEnter, onPvp }: { onEnter: () => void; onPvp?: 
             <div className="num">4</div>
             <Blocks size={22} />
             <h3>The block decides</h3>
-            <p>When the block lands, its hash and data resolve every bet instantly. Winners are paid from the house wallet. Check the result on the explorer.</p>
+            <p>When the block lands, its hash resolves every bet instantly. For P2P games, your bet is matched against an opponent — winner takes 99% of the pot. For pool games, winners share the entire pool proportionally. No house, fully verifiable.</p>
           </div>
         </div>
       </section>

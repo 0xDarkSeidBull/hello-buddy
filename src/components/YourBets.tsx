@@ -21,7 +21,14 @@ type EndedBet = {
   win: boolean;
   payout: number;
   settledAt: number;
+  refund?: boolean;
 };
+
+function betKind(b: { win: boolean; payout: number; refund?: boolean }): "win" | "refund" | "loss" {
+  if (b.win) return "win";
+  if (b.refund === true || (b.payout > 0 && !b.win)) return "refund";
+  return "loss";
+}
 
 const API_BASE = (import.meta as any).env?.VITE_API_URL || "";
 const PAGE_SIZE = 3;
@@ -173,12 +180,19 @@ export default function YourBets({
                 }
               }
               return (
-                <div key={i} className={`yb-ended ${b.win ? "win" : "loss"} ${isOpen ? "open" : ""}`}>
+                <div key={i} className={`yb-ended ${betKind(b)} ${isOpen ? "open" : ""}`}>
                   <button className="yb-ended-row" onClick={() => toggle(i, b.block)}>
                     <span className="yb-block mono">#{b.block}</span>
                     <span className="yb-mode-sm">{meta?.label ?? b.mode}</span>
-                    <span className={`yb-result ${b.win ? "win" : "loss"}`}>{b.win ? "WIN" : "LOSS"}</span>
-                    <span className="yb-pay mono"><Coin size={13} /> {(b.win ? b.payout : 0).toFixed(4)}</span>
+                    {(() => {
+                      const k = betKind(b);
+                      const label = k === "win" ? "WIN" : k === "refund" ? "REFUND ↩" : "LOSS";
+                      const amt = k === "win" ? b.payout : k === "refund" ? b.payout : 0;
+                      return <>
+                        <span className={`yb-result ${k}`} style={k === "refund" ? { color: "#f59e0b" } : undefined}>{label}</span>
+                        <span className="yb-pay mono"><Coin size={13} /> {amt.toFixed(4)}</span>
+                      </>;
+                    })()}
                     {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                   </button>
                   {isOpen && (
@@ -193,8 +207,8 @@ export default function YourBets({
                       <div className="yb-d-row"><i>Stake</i><b className="mono"><Coin size={13} /> {b.stake.toFixed(4)}</b></div>
                       <div className="yb-d-row">
                         <i>Result</i>
-                        <b className={b.win ? "win-t" : "loss-t"}>
-                          {b.win ? <>WIN · +<Coin size={13} /> {b.payout.toFixed(4)}</> : <>LOSS · −<Coin size={13} /> {b.stake.toFixed(4)}</>}
+                        <b className={betKind(b) === "win" ? "win-t" : betKind(b) === "refund" ? undefined : "loss-t"} style={betKind(b) === "refund" ? { color: "#f59e0b" } : undefined}>
+                          {betKind(b) === "win" ? <>WIN · +<Coin size={13} /> {b.payout.toFixed(4)}</> : betKind(b) === "refund" ? <>REFUND · ↩ <Coin size={13} /> {b.payout.toFixed(4)}</> : <>LOSS · −<Coin size={13} /> {b.stake.toFixed(4)}</>}
                         </b>
                       </div>
                       <a

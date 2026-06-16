@@ -256,7 +256,7 @@ export default function RoundCard({
               <div style={{ fontSize: 11, letterSpacing: ".22em" }}>
                 <Sparkles size={11} style={{ verticalAlign: "middle" }} /> PERFECT BLOCK
               </div>
-              <div style={{ fontSize: 28, letterSpacing: "-.02em" }}>50× WIN! 🎉</div>
+              <div style={{ fontSize: 28, letterSpacing: "-.02em" }}>PERFECT BLOCK WIN! 🎉</div>
             </motion.div>
           )}
 
@@ -374,6 +374,9 @@ export default function RoundCard({
               </div>
               <div className="pm-bar"><div className="em-fill" style={{ width: `${votedA}%` }} /></div>
               <div className="pm-players"><span>{playersA} players</span><span>{playersB} players</span></div>
+              <div style={{ fontSize: 12, color: "var(--text-2)", margin: "6px 0 8px", textAlign: "center" }}>
+                <span>If matched: <b style={{ color: "#00e5ff" }}><Coin size={13} /> 0.0196 zkLTC</b></span>
+              </div>
               <div className="pm-actions">
                 <button className="pm-yes glow" disabled={!isOpen} onClick={() => openBet(sideA)}>
                   <LeverSwitch pulled={leverPulled === sideA} side={sideA} size={26} />
@@ -441,19 +444,22 @@ export default function RoundCard({
                   onChange={(e) => setNum(e.target.value.replace(/\D/g, ""))}
                 />
               )}
-              {mode.kind === "perfectblock" && (
+              {(mode.kind === "digit" || mode.kind === "number" || mode.kind === "perfectblock") && (
                 <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
-                  <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> {(BET * mode.multiplier).toFixed(4)} zkLTC</b> (50×)</span>
-                </div>
-              )}
-              {mode.kind === "number" && (
-                <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
-                  <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> {(BET * mode.multiplier).toFixed(4)} zkLTC</b> ({mode.multiplier}×)</span>
+                  {modePool > 0 ? (
+                    <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> ~{(modePool * 0.99).toFixed(4)} zkLTC</b> (your share)</span>
+                  ) : (
+                    <span style={{ color: "#00e5ff" }}>Be first — winner takes all bets</span>
+                  )}
                 </div>
               )}
               {mode.kind === "pvp" && (
                 <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
-                  <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> {Math.max(0.0196, round.players * BET * 0.98).toFixed(4)} zkLTC</b> (winner takes pot)</span>
+                  {modePool > 0 ? (
+                    <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> ~{(modePool * 0.99).toFixed(4)} zkLTC</b> (your share)</span>
+                  ) : (
+                    <span style={{ color: "#00e5ff" }}>Be first — winner takes all bets</span>
+                  )}
                 </div>
               )}
               <button
@@ -513,7 +519,13 @@ export default function RoundCard({
               <span style={{ fontSize: 11, opacity: .8 }}>zkLTC</span>
             </span>
           </div>
-          {mode.multiplier > 0 && <div className="pm-bv-win"><span>If you win</span><b className="em"><Coin size={14} /> {(BET * mode.multiplier).toFixed(4)} zkLTC</b></div>}
+          {mode.kind === "binary" ? (
+            <div className="pm-bv-win"><span>If matched</span><b className="em"><Coin size={14} /> 0.0196 zkLTC</b></div>
+          ) : (mode.kind === "digit" || mode.kind === "number" || mode.kind === "perfectblock" || mode.kind === "pvp") && (
+            modePool > 0
+              ? <div className="pm-bv-win"><span>If you win</span><b className="em"><Coin size={14} /> ~{(modePool * 0.99).toFixed(4)} zkLTC</b></div>
+              : <div className="pm-bv-win"><span>Winner takes</span><b className="em">all bets</b></div>
+          )}
           <button className="pm-confirm" disabled={!canConfirm} onClick={confirm}>
             <LeverSwitch pulled={confirmPulled} side={finalPick} size={26} />
             <span className="pm-confirm-txt">{placing ? "Confirm in wallet…" : "Confirm Bet"}</span>

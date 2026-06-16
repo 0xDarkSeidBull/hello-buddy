@@ -16,7 +16,14 @@ type EndedBet = {
   payout: number;
   settledAt: number;
   payoutTx?: string | null;
+  refund?: boolean;
 };
+
+function betKind(b: { win: boolean; payout: number; refund?: boolean }): "win" | "refund" | "loss" {
+  if (b.win) return "win";
+  if (b.refund === true || (b.payout > 0 && !b.win)) return "refund";
+  return "loss";
+}
 
 type LiveGroup = {
   roundId: number;
@@ -75,9 +82,10 @@ const card = (highlight?: boolean): React.CSSProperties => ({
 const blockTitle: React.CSSProperties = {
   fontFamily: "'JetBrains Mono',monospace", fontWeight: 800, fontSize: 22, letterSpacing: "-.01em",
 };
-const priceBadge = (win: boolean): React.CSSProperties => ({
+const priceBadge = (kind: "win" | "loss" | "refund" | "live"): React.CSSProperties => ({
   position: "absolute", top: -18, right: -10, width: 78, height: 78, borderRadius: "50%",
-  background: win ? "#22c55e" : "#ef4444", color: "#fff", border: "3px solid #000",
+  background: kind === "win" || kind === "live" ? "#22c55e" : kind === "refund" ? "#f59e0b" : "#ef4444",
+  color: "#fff", border: "3px solid #000",
   boxShadow: "3px 3px 0 0 rgba(0,0,0,.9)",
   display: "grid", placeItems: "center", textAlign: "center", lineHeight: 1, fontWeight: 900,
   fontFamily: "'JetBrains Mono',monospace",
@@ -260,21 +268,30 @@ export default function YourBetsModal({
               <>
                 <div style={cardGrid}>
                   {pageGroups.map((g) => {
-                    const won = g.net >= 0;
+                    const hasWin = g.bets.some((b) => b.win);
+                    const hasRefund = g.bets.some((b) => !b.win && (b.refund || b.payout > 0));
+                    const kind: "win" | "loss" | "refund" =
+                      hasWin ? (g.net >= 0 ? "win" : "loss")
+                      : hasRefund && !g.bets.some((b) => betKind(b) === "loss") ? "refund"
+                      : "loss";
+                    const isPos = kind === "win" || (kind === "refund" && g.totalPayout > 0);
+                    const sign = kind === "win" ? (g.net >= 0 ? "+" : "-") : kind === "refund" ? "↩ " : "-";
+                    const amt = kind === "refund" ? g.totalPayout : Math.abs(g.net);
+                    const footerBg = kind === "win" ? "#22c55e" : kind === "refund" ? "#f59e0b" : "#ef4444";
                     return (
                       <BetCard
                         key={`ended-${g.block}`}
                         blockKey={`ended-${g.block}`}
                         blockLabel={`#${g.block.toLocaleString()}`}
-                        badgeKind={won ? "win" : "loss"}
-                        badgeValue={<><>{won ? "+" : "-"}</><Coin size={11} />{Math.abs(g.net).toFixed(4)}</>}
+                        badgeKind={kind}
+                        badgeValue={<><>{sign}</><Coin size={11} />{amt.toFixed(4)}</>}
                         betsByMode={Object.fromEntries(g.bets.map((b) => [b.mode, b]))}
                         showPointsBadge
                         onModeClick={(m) => openDetail(`ended-${g.block}`, m, g.block)}
                         footer={
                           <a href={`${EXPLORER}/block/${g.block}`} target="_blank" rel="noreferrer"
                             style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-                              marginTop: 14, background: won ? "#22c55e" : "#ef4444", color: "#fff",
+                              marginTop: 14, background: footerBg, color: "#fff",
                               border: "3px solid #000", borderRadius: 10, padding: "10px 12px",
                               fontWeight: 800, textDecoration: "none",
                               boxShadow: "3px 3px 0 0 rgba(0,0,0,.9)" }}>
@@ -343,7 +360,7 @@ function BetCard({
 }: {
   blockKey: string;
   blockLabel: string;
-  badgeKind: "live" | "win" | "loss";
+  badgeKind: "live" | "win" | "loss" | "refund";
   badgeValue?: React.ReactNode;
   betsByMode: Record<string, any>;
   onModeClick: (mode: string) => void;
@@ -354,9 +371,9 @@ function BetCard({
 }) {
   const badge =
     badgeKind === "live"
-      ? <div style={priceBadge(true)}><div style={{ fontSize: 11 }}>LIVE</div><div style={{ fontSize: 10, opacity: .9 }}>~ est</div></div>
-      : <div style={priceBadge(badgeKind === "win")}>
-          <div style={{ fontSize: 11 }}>{badgeKind === "win" ? "WIN" : "LOSS"}</div>
+      ? <div style={priceBadge("live")}><div style={{ fontSize: 11 }}>LIVE</div><div style={{ fontSize: 10, opacity: .9 }}>~ est</div></div>
+      : <div style={priceBadge(badgeKind)}>
+          <div style={{ fontSize: 11 }}>{badgeKind === "win" ? "WIN" : badgeKind === "refund" ? "REFUND ↩" : "LOSS"}</div>
           <div style={{ fontSize: 11, marginTop: 2 }}>{badgeValue}</div>
         </div>;
   const ptsPill = (label: string, bonus?: boolean): React.CSSProperties => ({
@@ -455,8 +472,14 @@ function ModeDetail({
         <Row k="Your pick" v={bet.pick.toUpperCase()} mono />
         <Row k="Block produced" v={String(actual)} mono />
         <Row k="Stake" v={<><Coin size={13} /> {bet.stake.toFixed(4)}</>} mono />
-        <Row k="Result" v={bet.win ? <>WIN +<Coin size={13} />{bet.payout.toFixed(4)}</> : <>LOSS -<Coin size={13} />{bet.stake.toFixed(4)}</>}
-          color={bet.win ? "#16a34a" : "#dc2626"} />
+        {(() => {
+          const k = betKind(bet);
+          const color = k === "win" ? "#16a34a" : k === "refund" ? "#d97706" : "#dc2626";
+          const node = k === "win" ? <>WIN +<Coin size={13} />{bet.payout.toFixed(4)}</>
+            : k === "refund" ? <>REFUND ↩ <Coin size={13} />{bet.payout.toFixed(4)}</>
+            : <>LOSS -<Coin size={13} />{bet.stake.toFixed(4)}</>;
+          return <Row k="Result" v={node} color={color} />;
+        })()}
       </>
     ) : <NoBet />;
   }
