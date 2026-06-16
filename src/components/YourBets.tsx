@@ -207,8 +207,8 @@ export default function YourBets({
                       <div className="yb-d-row"><i>Stake</i><b className="mono"><Coin size={13} /> {b.stake.toFixed(4)}</b></div>
                       <div className="yb-d-row">
                         <i>Result</i>
-                        <b className={b.win ? "win-t" : "loss-t"}>
-                          {b.win ? <>WIN · +<Coin size={13} /> {b.payout.toFixed(4)}</> : <>LOSS · −<Coin size={13} /> {b.stake.toFixed(4)}</>}
+                        <b className={betKind(b) === "win" ? "win-t" : betKind(b) === "refund" ? undefined : "loss-t"} style={betKind(b) === "refund" ? { color: "#f59e0b" } : undefined}>
+                          {betKind(b) === "win" ? <>WIN · +<Coin size={13} /> {b.payout.toFixed(4)}</> : betKind(b) === "refund" ? <>REFUND · ↩ <Coin size={13} /> {b.payout.toFixed(4)}</> : <>LOSS · −<Coin size={13} /> {b.stake.toFixed(4)}</>}
                         </b>
                       </div>
                       <a
