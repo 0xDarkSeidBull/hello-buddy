@@ -253,11 +253,46 @@ export default function RoundCard({
           )}
 
           {/* banks */}
-          <div className="pm-banks">
-            <div><p>Total Pot</p><b style={{color:"#000"}}><Coin size={14} /> {totalPot.toFixed(2)}</b></div>
-            <div><p>Bank {sideA.toUpperCase()}</p><b className="em"><Coin size={14} /> {bankA.toFixed(2)}</b></div>
-            <div><p>Bank {sideB.toUpperCase()}</p><b className="ro"><Coin size={14} /> {bankB.toFixed(2)}</b></div>
-          </div>
+          {mode.kind === "binary" ? (
+            <>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+                <span style={{
+                  fontSize: 10, fontWeight: 800, letterSpacing: ".14em",
+                  textTransform: "uppercase",
+                  background: "rgba(124,92,255,.14)", color: "#7c5cff",
+                  border: "1px solid rgba(124,92,255,.45)",
+                  padding: "3px 8px", borderRadius: 999,
+                }}>P2P · 0.01 zkLTC flat</span>
+              </div>
+              <div className="pm-banks">
+                <div>
+                  <p>Pool {sideA.toUpperCase()}</p>
+                  <b className="em"><Coin size={14} /> {bankA.toFixed(2)}</b>
+                  <div style={{ fontSize: 10, color: "var(--muted)", marginTop: 4, fontWeight: 700 }}>
+                    {playersA} opponent{playersA === 1 ? "" : "s"} waiting
+                  </div>
+                </div>
+                <div>
+                  <p>Pool {sideB.toUpperCase()}</p>
+                  <b className="ro"><Coin size={14} /> {bankB.toFixed(2)}</b>
+                  <div style={{ fontSize: 10, color: "var(--muted)", marginTop: 4, fontWeight: 700 }}>
+                    {playersB} opponent{playersB === 1 ? "" : "s"} waiting
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="pm-banks">
+              <div>
+                <p>Total Pool</p>
+                <b style={{ color: "#000" }}><Coin size={14} /> {modePool.toFixed(2)} zkLTC</b>
+              </div>
+              <div>
+                <p>Your Share</p>
+                <b className="em">{yourSharePct.toFixed(1)}%</b>
+              </div>
+            </div>
+          )}
 
           {/* mode selector */}
           <div className="pm-modes">
