@@ -256,7 +256,7 @@ export default function RoundCard({
               <div style={{ fontSize: 11, letterSpacing: ".22em" }}>
                 <Sparkles size={11} style={{ verticalAlign: "middle" }} /> PERFECT BLOCK
               </div>
-              <div style={{ fontSize: 28, letterSpacing: "-.02em" }}>50× WIN! 🎉</div>
+              <div style={{ fontSize: 28, letterSpacing: "-.02em" }}>PERFECT BLOCK WIN! 🎉</div>
             </motion.div>
           )}
 
