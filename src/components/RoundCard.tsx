@@ -449,7 +449,7 @@ export default function RoundCard({
                   {modePool > 0 ? (
                     <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> ~{(modePool * 0.99).toFixed(4)} zkLTC</b> (your share)</span>
                   ) : (
-                    <span style={{ color: "#00e5ff" }}>Be first — winner takes all bets</span>
+                    <span style={{ color: "#00e5ff" }}>Be first · winner takes all bets</span>
                   )}
                 </div>
               )}
@@ -458,7 +458,7 @@ export default function RoundCard({
                   {modePool > 0 ? (
                     <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> ~{(modePool * 0.99).toFixed(4)} zkLTC</b> (your share)</span>
                   ) : (
-                    <span style={{ color: "#00e5ff" }}>Be first — winner takes all bets</span>
+                    <span style={{ color: "#00e5ff" }}>Be first · winner takes all bets</span>
                   )}
                 </div>
               )}
