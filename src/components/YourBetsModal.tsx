@@ -472,8 +472,14 @@ function ModeDetail({
         <Row k="Your pick" v={bet.pick.toUpperCase()} mono />
         <Row k="Block produced" v={String(actual)} mono />
         <Row k="Stake" v={<><Coin size={13} /> {bet.stake.toFixed(4)}</>} mono />
-        <Row k="Result" v={bet.win ? <>WIN +<Coin size={13} />{bet.payout.toFixed(4)}</> : <>LOSS -<Coin size={13} />{bet.stake.toFixed(4)}</>}
-          color={bet.win ? "#16a34a" : "#dc2626"} />
+        {(() => {
+          const k = betKind(bet);
+          const color = k === "win" ? "#16a34a" : k === "refund" ? "#d97706" : "#dc2626";
+          const node = k === "win" ? <>WIN +<Coin size={13} />{bet.payout.toFixed(4)}</>
+            : k === "refund" ? <>REFUND ↩ <Coin size={13} />{bet.payout.toFixed(4)}</>
+            : <>LOSS -<Coin size={13} />{bet.stake.toFixed(4)}</>;
+          return <Row k="Result" v={node} color={color} />;
+        })()}
       </>
     ) : <NoBet />;
   }
