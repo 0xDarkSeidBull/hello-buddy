@@ -10,7 +10,7 @@ export const NETWORKS = {
     chainId: 4441,
     chainIdHex: "0x115D",
     rpcUrl: "https://liteforge.rpc.caldera.xyz/http",
-    apiBase: "http://155.133.23.14:3201",
+    apiBase: "https://betsonblock-api.test-hub.xyz",
     houseAddress: "0x554FA14360dEaE7A7ec6b9216Fa9Ca3cA76983a0",
     isNative: true,
   },
