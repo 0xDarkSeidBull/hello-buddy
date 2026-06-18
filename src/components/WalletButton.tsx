@@ -4,8 +4,10 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import Coin from "./Coin";
+import { useNetwork } from "../context/NetworkContext";
 
 export default function WalletButton() {
+  const { network } = useNetwork();
   const { address, isConnected } = useAccount();
   const { data: bal } = useBalance({ address });
   const { disconnect } = useDisconnect();
@@ -34,7 +36,7 @@ export default function WalletButton() {
           <>
             <div className="bal" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
               <Coin size={14} />
-              {balNum.toLocaleString(undefined, { maximumFractionDigits: 4 })} zkLTC
+              {balNum.toLocaleString(undefined, { maximumFractionDigits: 4 })} {network.currency}
             </div>
             <button className="btn btn-ghost btn-sm wallet-chip" onClick={() => setOpen(true)}>
               <span className="wb-avatar"><Jazzicon diameter={18} seed={jsNumberForAddress(address)} /></span>
@@ -95,7 +97,7 @@ export default function WalletButton() {
                       {balNum.toLocaleString(undefined, { maximumFractionDigits: 6 })}
                     </b>
                     <span style={{ color: "#9ca3af", fontSize: 12, textTransform: "uppercase", letterSpacing: ".12em" }}>
-                      zkLTC
+                      {network.currency}
                     </span>
                   </div>
 

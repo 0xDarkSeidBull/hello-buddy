@@ -6,6 +6,7 @@ import { MODES, HEX, signals, type ModeMeta, type ModeId } from "../lib/modes";
 import Coin from "./Coin";
 import ModeHelpModal from "./ModeHelpModal";
 import * as W from "../lib/wallet";
+import { useNetwork } from "../context/NetworkContext";
 import LeverSwitch from "./LeverSwitch";
 import BetToast, { type BetToastData } from "./BetToast";
 import PvpWheel from "./PvpWheel";
@@ -31,6 +32,8 @@ export default function RoundCard({
   onBet: (i: { mode: string; pick: string; txHash: string }) => void;
 }) {
   const now = useNow();
+  const { network } = useNetwork();
+  const CCY = network.currency;
   const [mode, setMode] = React.useState<ModeMeta>(MODES[0]);
   const [showBet, setShowBet] = React.useState(false);
   const [pick, setPick] = React.useState("even");
@@ -275,11 +278,11 @@ export default function RoundCard({
               <div className="pm-banks">
                 <div>
                   <p>Pool {sideA.toUpperCase()}</p>
-                  <b className="em"><Coin size={14} /> {bankA.toFixed(2)} zkLTC</b>
+                  <b className="em"><Coin size={14} /> {bankA.toFixed(2)} {CCY}</b>
                 </div>
                 <div>
                   <p>Pool {sideB.toUpperCase()}</p>
-                  <b className="ro"><Coin size={14} /> {bankB.toFixed(2)} zkLTC</b>
+                  <b className="ro"><Coin size={14} /> {bankB.toFixed(2)} {CCY}</b>
                 </div>
               </div>
             </>
@@ -297,7 +300,7 @@ export default function RoundCard({
               <div className="pm-banks">
                 <div>
                   <p>Total Pool</p>
-                  <b style={{ color: "#000" }}><Coin size={14} /> {modePool.toFixed(2)} zkLTC</b>
+                  <b style={{ color: "#000" }}><Coin size={14} /> {modePool.toFixed(2)} {CCY}</b>
                 </div>
                 <div>
                   <p>Your Share</p>
@@ -319,7 +322,7 @@ export default function RoundCard({
               <div className="pm-banks">
                 <div>
                   <p>Total Pool</p>
-                  <b style={{ color: "#000" }}><Coin size={14} /> {modePool.toFixed(2)} zkLTC</b>
+                  <b style={{ color: "#000" }}><Coin size={14} /> {modePool.toFixed(2)} {CCY}</b>
                 </div>
                 <div>
                   <p>Your Share</p>
@@ -375,7 +378,7 @@ export default function RoundCard({
                 const estimate = totalPool * 0.99 * (BET / myPool);
                 return (
                   <div style={{ fontSize: 12, color: "var(--text-2)", margin: "6px 0 8px", textAlign: "center" }}>
-                    <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> ~{estimate.toFixed(4)} zkLTC</b></span>
+                    <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> ~{estimate.toFixed(4)} {CCY}</b></span>
                   </div>
                 );
               })()}
@@ -449,7 +452,7 @@ export default function RoundCard({
               {(mode.kind === "digit" || mode.kind === "number" || mode.kind === "perfectblock") && (
                 <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
                   {modePool > 0 ? (
-                    <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> ~{(modePool * 0.99).toFixed(4)} zkLTC</b> (your share)</span>
+                    <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> ~{(modePool * 0.99).toFixed(4)} {CCY}</b> (your share)</span>
                   ) : (
                     <span style={{ color: "#00e5ff" }}>Be first · winner takes all bets</span>
                   )}
@@ -458,7 +461,7 @@ export default function RoundCard({
               {mode.kind === "pvp" && (
                 <div style={{ fontSize: 12, color: "var(--text-2)", margin: "-2px 0 12px" }}>
                   {modePool > 0 ? (
-                    <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> ~{(modePool * 0.99).toFixed(4)} zkLTC</b> (your share)</span>
+                    <span>If you win: <b style={{ color: "#00e5ff" }}><Coin size={13} /> ~{(modePool * 0.99).toFixed(4)} {CCY}</b> (your share)</span>
                   ) : (
                     <span style={{ color: "#00e5ff" }}>Be first · winner takes all bets</span>
                   )}
@@ -518,14 +521,14 @@ export default function RoundCard({
                   cursor: "not-allowed", opacity: 0.85,
                 }}
               />
-              <span style={{ fontSize: 11, opacity: .8 }}>zkLTC</span>
+              <span style={{ fontSize: 11, opacity: .8 }}>{CCY}</span>
             </span>
           </div>
           {mode.kind === "binary" ? (
-            <div className="pm-bv-win"><span>If matched</span><b className="em"><Coin size={14} /> 0.0196 zkLTC</b></div>
+            <div className="pm-bv-win"><span>If matched</span><b className="em"><Coin size={14} /> 0.0196 {CCY}</b></div>
           ) : (mode.kind === "digit" || mode.kind === "number" || mode.kind === "perfectblock" || mode.kind === "pvp") && (
             modePool > 0
-              ? <div className="pm-bv-win"><span>If you win</span><b className="em"><Coin size={14} /> ~{(modePool * 0.99).toFixed(4)} zkLTC</b></div>
+              ? <div className="pm-bv-win"><span>If you win</span><b className="em"><Coin size={14} /> ~{(modePool * 0.99).toFixed(4)} {CCY}</b></div>
               : <div className="pm-bv-win"><span>Winner takes</span><b className="em">all bets</b></div>
           )}
           <button className="pm-confirm" disabled={!canConfirm} onClick={confirm}>

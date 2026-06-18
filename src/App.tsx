@@ -249,7 +249,7 @@ export default function App() {
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <div>
               <h1 className="page-title">Live Rounds</h1>
-              <p className="page-sub">Place bets while a round is open. Stack multiple modes, each is a flat 0.01 zkLTC.</p>
+              <p className="page-sub">Place bets while a round is open. Stack multiple modes, each is a flat {network.stakeDisplay}.</p>
             </div>
             {addr && (
               <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
