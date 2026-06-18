@@ -1,5 +1,7 @@
 /** api.ts — thin client for the BetsOnBlock backend. */
 
+import { NETWORKS, getActiveNetworkId } from "./networkConfig";
+
 export type RoundView = {
   id: number;
   status: "open" | "locked" | "settling" | "settled";
@@ -16,6 +18,16 @@ export type RoundView = {
 
 export type Paginated<T> = { page: number; pages: number; total: number; limit: number } & T;
 
+export function getApiBase(): string {
+  return NETWORKS[getActiveNetworkId()].apiBase;
+}
+
+function u(path: string): string {
+  const base = getApiBase();
+  if (!base) return path;
+  return base.replace(/\/+$/, "") + path;
+}
+
 async function j<T>(url: string, init?: RequestInit): Promise<T> {
   const r = await fetch(url, init);
   if (!r.ok) {
@@ -27,18 +39,19 @@ async function j<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  rounds: () => j<{ rounds: RoundView[] }>("/api/rounds"),
-  history: (n = 20) => j<{ history: RoundView[] }>(`/api/history?n=${n}`),
+  rounds: () => j<{ rounds: RoundView[] }>(u("/api/rounds")),
+  history: (n = 20) => j<{ history: RoundView[] }>(u(`/api/history?n=${n}`)),
   historyPage: (page = 1, limit = 20) =>
-    j<Paginated<{ history: RoundView[] }>>(`/api/history?page=${page}&limit=${limit}`),
+    j<Paginated<{ history: RoundView[] }>>(u(`/api/history?page=${page}&limit=${limit}`)),
   betsFor: (wallet: string, page = 1, limit = 20) =>
-    j<Paginated<{ bets: any[] }>>(`/api/bets/${wallet}?page=${page}&limit=${limit}`),
-  head: () => j<{ block: number }>("/api/head"),
-  verify: (block: number) => j<{ block: any; signals: any }>(`/api/verify/${block}`),
+    j<Paginated<{ bets: any[] }>>(u(`/api/bets/${wallet}?page=${page}&limit=${limit}`)),
+  head: () => j<{ block: number }>(u("/api/head")),
+  verify: (block: number) => j<{ block: any; signals: any }>(u(`/api/verify/${block}`)),
   bet: (body: { wallet: string; roundId: number; mode: string; pick: string; stake: number }) =>
-    j<{ ok: boolean; error?: string; round?: RoundView }>("/api/bet", {
+    j<{ ok: boolean; error?: string; round?: RoundView }>(u("/api/bet"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     }),
 };
+
