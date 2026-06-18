@@ -23,7 +23,7 @@ export const NETWORKS = {
     chainId: 8453,
     chainIdHex: "0x2105",
     rpcUrl: "https://mainnet.base.org",
-    apiBase: "http://155.133.23.14:3202",
+    apiBase: "https://bz-base.test-hub.xyz",
     houseAddress: "0x3BC6348E1E569E97Bd8247b093475A4aC22B9fD4",
     usdcAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     isNative: false,
