@@ -56,18 +56,76 @@ export async function getBalance(addr: string): Promise<number> {
   } catch { return 0; }
 }
 
-/** Send the fixed 0.01 zkLTC stake to the house wallet. Returns the tx hash. */
-export async function sendStake(): Promise<string> {
+import { NETWORKS, getActiveNetworkId } from "./networkConfig";
+
+/** Send the fixed-stake bet to the active network's house wallet. Returns the tx hash. */
+export async function sendStake(fromAddr?: string): Promise<string> {
   const eth = (window as any).ethereum;
-  if (!eth) throw new Error("No wallet");
-  await ensureChain();
-  const [from] = await eth.request({ method: "eth_accounts" });
-  const valueHex = "0x" + parseEther(BET_AMOUNT).toString(16);
-  const hash = await eth.request({
-    method: "eth_sendTransaction",
-    params: [{ from, to: HOUSE_ADDRESS, value: valueHex }],
-  });
-  return hash as string;
+  if (!eth) throw new Error("No wallet found. Install MetaMask.");
+  const networkId = getActiveNetworkId();
+  const config = NETWORKS[networkId];
+
+  // Switch to correct network; add chain if missing.
+  try {
+    await eth.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: config.chainIdHex }],
+    });
+  } catch (switchError: any) {
+    if (switchError?.code === 4902) {
+      if (networkId === "base") {
+        await eth.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: "0x2105",
+            chainName: "Base",
+            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+            rpcUrls: ["https://mainnet.base.org"],
+            blockExplorerUrls: ["https://basescan.org"],
+          }],
+        });
+      } else {
+        await eth.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: config.chainIdHex,
+            chainName: "LiteForge",
+            rpcUrls: [config.rpcUrl],
+            nativeCurrency: { name: "zkLTC", symbol: "zkLTC", decimals: 18 },
+            blockExplorerUrls: ["https://liteforge.explorer.caldera.xyz"],
+          }],
+        });
+      }
+    } else {
+      throw switchError;
+    }
+  }
+
+  const from = fromAddr || (await eth.request({ method: "eth_accounts" }))[0];
+  if (!from) throw new Error("No account");
+
+  if (config.isNative) {
+    // Native transfer (zkLTC)
+    const valueHex = "0x" + parseEther(String(config.stakeAmount)).toString(16);
+    const hash = await eth.request({
+      method: "eth_sendTransaction",
+      params: [{ from, to: config.houseAddress, value: valueHex }],
+    });
+    return hash as string;
+  } else {
+    // ERC-20 transfer (USDC, 6 decimals)
+    const units = BigInt(Math.round(config.stakeAmount * 1e6));
+    const amountHex = units.toString(16);
+    const data =
+      "0xa9059cbb" +
+      config.houseAddress.slice(2).toLowerCase().padStart(64, "0") +
+      amountHex.padStart(64, "0");
+    const hash = await eth.request({
+      method: "eth_sendTransaction",
+      params: [{ from, to: (config as any).usdcAddress, data, value: "0x0" }],
+    });
+    return hash as string;
+  }
 }
 
 export function onAccountsChanged(cb: (addr: string | null) => void) {
