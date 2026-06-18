@@ -19,6 +19,8 @@ import HeaderStats from "./components/HeaderStats";
 import PvpPage from "./components/PvpPage";
 import AboutPage from "./components/AboutPage";
 import { sounds } from "./lib/pvpSounds";
+import NetworkSwitcher from "./components/NetworkSwitcher";
+import { useNetwork } from "./context/NetworkContext";
 
 function PvpButton({ onClick }: { onClick: () => void }) {
   return (
