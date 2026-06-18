@@ -521,7 +521,7 @@ export default function RoundCard({
                   cursor: "not-allowed", opacity: 0.85,
                 }}
               />
-              <span style={{ fontSize: 11, opacity: .8 }}>zkLTC</span>
+              <span style={{ fontSize: 11, opacity: .8 }}>{CCY}</span>
             </span>
           </div>
           {mode.kind === "binary" ? (
