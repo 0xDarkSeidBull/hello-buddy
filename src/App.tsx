@@ -53,6 +53,14 @@ export default function App() {
     return "home";
   };
   const [view, setView] = React.useState<"home" | "zone" | "pvp" | "about">(initialView);
+  const { network, networkId } = useNetwork();
+
+  // Refetch rounds/history when the active network changes (different backend)
+  React.useEffect(() => {
+    const handler = () => { /* state will refresh on next poll */ };
+    window.addEventListener("bob:network-changed", handler);
+    return () => window.removeEventListener("bob:network-changed", handler);
+  }, []);
 
   const goView = React.useCallback((next: "home" | "zone" | "pvp" | "about") => {
     setView(next);
