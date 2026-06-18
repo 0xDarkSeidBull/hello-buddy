@@ -53,7 +53,7 @@ export default function App() {
     return "home";
   };
   const [view, setView] = React.useState<"home" | "zone" | "pvp" | "about">(initialView);
-  const { network, networkId } = useNetwork();
+  const { network } = useNetwork();
 
   // Refetch rounds/history when the active network changes (different backend)
   React.useEffect(() => {
