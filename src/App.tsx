@@ -200,6 +200,7 @@ export default function App() {
               <HeaderStats />
             </div>
             <div className="top-right">
+              <NetworkSwitcher />
               <div className="live-head"><span className="pulse" /> Block <b className="mono" style={{ marginLeft: 4 }}>#{head?.toLocaleString() ?? "…"}</b></div>
               <button className="btn btn-primary btn-sm" onClick={() => goView("zone")}>Enter Zone</button>
             </div>
@@ -226,6 +227,7 @@ export default function App() {
             <PvpButton onClick={() => goView("pvp")} />
           </div>
           <div className="top-right">
+            <NetworkSwitcher />
             <div className="live-head"><span className="pulse" /> Block <b className="mono" style={{ marginLeft: 4 }}>#{head?.toLocaleString() ?? "…"}</b></div>
             <WalletButton />
           </div>
@@ -236,7 +238,7 @@ export default function App() {
           <div className="item"><span className="k">Live Pot</span><span className="v" style={{ color: "#000", display: "inline-flex", alignItems: "center", gap: 6 }}><CoinImg /> {totalLiveStaked.toFixed(2)}</span></div>
           <div className="item"><span className="k">Players In Play</span><span className="v">{totalLivePlayers}</span></div>
           <div className="item"><span className="k">Active Rounds</span><span className="v">{rounds.length}</span></div>
-          <div className="item"><span className="k">Bet Size</span><span className="v" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CoinImg /> 0.01 zkLTC</span></div>
+          <div className="item"><span className="k">Bet Size</span><span className="v" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CoinImg /> {network.stakeDisplay}</span></div>
           <div className="item"><span className="k">Block Time</span><span className="v">~0.2s</span></div>
         </div>
 
