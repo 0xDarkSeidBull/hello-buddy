@@ -6,6 +6,7 @@ import { MODES, HEX, signals, type ModeMeta, type ModeId } from "../lib/modes";
 import Coin from "./Coin";
 import ModeHelpModal from "./ModeHelpModal";
 import * as W from "../lib/wallet";
+import { useNetwork } from "../context/NetworkContext";
 import LeverSwitch from "./LeverSwitch";
 import BetToast, { type BetToastData } from "./BetToast";
 import PvpWheel from "./PvpWheel";
@@ -31,6 +32,8 @@ export default function RoundCard({
   onBet: (i: { mode: string; pick: string; txHash: string }) => void;
 }) {
   const now = useNow();
+  const { network } = useNetwork();
+  const CCY = network.currency;
   const [mode, setMode] = React.useState<ModeMeta>(MODES[0]);
   const [showBet, setShowBet] = React.useState(false);
   const [pick, setPick] = React.useState("even");
